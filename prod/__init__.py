@@ -7,6 +7,9 @@ def create_app(script_info=None):
     # Instanciar la aplicacion
     app = Flask(__name__)
 
+    from flask_cors import CORS
+    CORS(app)
+
     # Configuracion
     app_settings = os.getenv("APP_SETTINGS")
     app.config.from_object(app_settings)
@@ -17,5 +20,7 @@ def create_app(script_info=None):
 
 
 def import_blueprints(app):
-    from .api.projects_list_api import projects_list_api
+    from prod.api.Web.projects_list_api import projects_list_api
     app.register_blueprint(projects_list_api)
+    from prod.api.project_api import project_api
+    app.register_blueprint(project_api)
