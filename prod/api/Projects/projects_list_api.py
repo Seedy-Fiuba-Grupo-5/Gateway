@@ -1,18 +1,18 @@
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 import requests
-URL = 'https://seedy-fiuba-backend-projects.herokuapp.com/projects'
+URL_PROJECTS = 'https://seedy-fiuba-backend-projects.herokuapp.com/projects'
 
 projects_list_api = Blueprint("projects_list_api", __name__)
 api = Api(projects_list_api)
 
 class ProjectsListResource(Resource):
     def get(self):
-        response = requests.get(URL)
+        response = requests.get(URL_PROJECTS)
         return response.json()
 
     def post(self):
-        response = requests.post(URL, json=request.get_json())
+        response = requests.post(URL_PROJECTS, json=request.get_json())
         return response.json()
 
 
