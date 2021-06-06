@@ -41,7 +41,7 @@ heroku login
   
 Agregar repositorio remoto de Heroku
 ```
-heroku git:remote -a seedy-fiuba
+heroku git:remote --app seedy-fiuba
 ```
 Nota: El creador del repositorio de Heroku deberia hacer colaborado a quienes quieren pushear al mismo.  
   
