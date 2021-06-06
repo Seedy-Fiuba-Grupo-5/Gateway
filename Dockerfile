@@ -15,7 +15,7 @@ COPY ./requirements-gateway.txt /usr/src/app/requirements-gateway.txt
 RUN pip install -Ur requirements-gateway.txt
 
 # Copiar archivos de produccion
-COPY ./prod /usr/src/app/gateway/prod
+COPY ./prod /usr/src/app/prod
 
 # Indica al inteprete de Python que no genere archivos .pyc
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -35,4 +35,4 @@ ENV PROJECTS_BACKEND_URL='https://seedy-fiuba-backend-projects.herokuapp.com'
 ENV USERS_BACKEND_URL='https://seedy-fiuba-backend-users.herokuapp.com'
 
 # Ejecutar el script entrypoint.sh
-ENTRYPOINT ["sh", "/usr/src/app/gateway/prod/entrypoint.sh"]
+ENTRYPOINT ["sh", "/usr/src/app/prod/entrypoint.sh"]
