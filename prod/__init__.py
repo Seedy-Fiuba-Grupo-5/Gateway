@@ -7,10 +7,6 @@ def create_app(script_info=None):
     # Instanciar la aplicacion
     app = Flask(__name__)
 
-    # Configuracion
-    app_settings = os.getenv("APP_SETTINGS")
-    app.config.from_object(app_settings)
-
     import_blueprints(app)
 
     return app
