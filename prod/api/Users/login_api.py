@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 import requests
-URL_USERS = 'https://seedy-fiuba-backend-users.herokuapp.com/users/login'
+import os
+URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/login"
 
 login_api = Blueprint("login_api", __name__)
 api = Api(login_api)
