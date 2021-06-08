@@ -25,5 +25,5 @@ def import_blueprints(app):
     from prod.api.Users.user_api import user_api
     app.register_blueprint(user_api)
 
-    from prod.api.Users.login_api import login_api
-    app.register_blueprint(login_api)
+    #from prod.api.Users.login_api import login_api
+    #app.register_blueprint(login_api)
