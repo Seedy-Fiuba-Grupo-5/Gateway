@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_restful import Api, Resource
 import requests
-URL_PROJECTS = 'https://seedy-fiuba-backend-projects.herokuapp.com/projects'
+import os
+URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 
 projects_list_api = Blueprint("projects_list_api", __name__)
 api = Api(projects_list_api)
