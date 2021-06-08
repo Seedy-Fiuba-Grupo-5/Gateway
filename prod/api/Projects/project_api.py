@@ -10,6 +10,7 @@ ns = Namespace(
 
 
 @ns.route('')
+@ns.param('project_id', 'The project identifier')
 class ProjectResource(Resource):
     PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
 

@@ -19,9 +19,6 @@ def import_blueprints(app):
     app.register_blueprint(api_v1_bp)
 
     # TODO: Migrar a swagger style
-    from prod.api.Projects.projects_list_api import projects_list_api
-    app.register_blueprint(projects_list_api)
-
     from prod.api.Users.user_list_api import users_list_api
     app.register_blueprint(users_list_api)
 
