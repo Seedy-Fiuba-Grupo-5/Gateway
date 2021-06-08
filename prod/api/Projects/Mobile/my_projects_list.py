@@ -62,4 +62,4 @@ class MyProjectsListResource(Resource):
         response = requests.post(URL_PROJECTS, json=request.get_json())
         if response.status_code == 201:
             requests.post(URL_USERS+user_id+'/projects', json={"project_id": response.json()['id']})
-        return response.json(), 201
+        return response.json()
