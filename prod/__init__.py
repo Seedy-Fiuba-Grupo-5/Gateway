@@ -21,6 +21,3 @@ def import_blueprints(app):
     # TODO: Migrar a swagger style
     from prod.api.Users.user_list_api import users_list_api
     app.register_blueprint(users_list_api)
-
-    from prod.api.Users.user_api import user_api
-    app.register_blueprint(user_api)

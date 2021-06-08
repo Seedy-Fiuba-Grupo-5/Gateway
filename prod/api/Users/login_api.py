@@ -15,22 +15,22 @@ class LoginResource(Resource):
     MISSING_ARGS_ERROR = 'Missing arguments'
     WRONG_DATA_ERROR = 'Email or password incorrect'
 
-    body_swg = ns.model('Login input', {
+    body_swg = ns.model('LoginInput', {
         'email': fields.String(required=True, description='The user email'),
         'password': fields.String(
             required=True, description='The user password')
     })
 
-    code_200_swg = ns.model('Login output 200', {
+    code_200_swg = ns.model('LoginOutput200', {
         'email': fields.String(description='The user email'),
         'id': fields.Integer(description='The user id')
     })
 
-    code_400_swg = ns.model('Login output 400', {
+    code_400_swg = ns.model('LoginOutput400', {
         'status': fields.String(example=MISSING_ARGS_ERROR)
     })
 
-    code_401_swg = ns.model('Login output 401', {
+    code_401_swg = ns.model('LoginOutput401', {
         'status': fields.String(example=WRONG_DATA_ERROR)
     })
 
