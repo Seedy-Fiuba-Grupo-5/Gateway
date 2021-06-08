@@ -7,6 +7,16 @@ from .Projects.project_api import ns as project_ns
 from .Projects.projects_list_api import ns as projects_list_ns
 from .Users.login_api import ns as login_ns
 from .Users.user_api import ns as user_ns
+from .Users.user_list_api import ns as user_list_ns
+
+NAMESPACES = (
+  my_projects_list_ns,
+  project_ns,
+  projects_list_ns,
+  login_ns,
+  user_ns,
+  user_list_ns
+)
 
 # Base API
 
@@ -18,11 +28,8 @@ api_base = Api(
     description='Gateway service operations'
 )
 
-api_base.add_namespace(my_projects_list_ns)
-api_base.add_namespace(project_ns)
-api_base.add_namespace(projects_list_ns)
-api_base.add_namespace(login_ns)
-api_base.add_namespace(user_ns)
+for ns in NAMESPACES:
+  api_base.add_namespace(ns)
 
 # API v1
 V1_PREFIX = '/v1/'
@@ -34,8 +41,6 @@ api_v1 = Api(
     description='Gateway service operations'
 )
 
-api_v1.add_namespace(my_projects_list_ns)
-api_v1.add_namespace(project_ns)
-api_v1.add_namespace(projects_list_ns)
-api_v1.add_namespace(login_ns)
-api_v1.add_namespace(user_ns)
+for ns in NAMESPACES:
+  api_v1.add_namespace(ns)
+
