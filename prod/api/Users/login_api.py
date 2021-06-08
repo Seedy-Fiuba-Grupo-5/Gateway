@@ -1,16 +1,43 @@
-from flask import Blueprint, request
-from flask_restful import Api, Resource
+from flask import request
+from flask_restx import Namespace, Resource, fields
 import requests
 import os
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/login"
 
-login_api = Blueprint("login_api", __name__)
-api = Api(login_api)
+ns = Namespace(
+    'users/login',
+    description='Users login operations'
+)
 
+
+@ns.route('')
 class LoginResource(Resource):
+    MISSING_ARGS_ERROR = 'Missing arguments'
+    WRONG_DATA_ERROR = 'Email or password incorrect'
+
+    body_swg = ns.model('LoginInput', {
+        'email': fields.String(required=True, description='The user email'),
+        'password': fields.String(
+            required=True, description='The user password')
+    })
+
+    code_200_swg = ns.model('LoginOutput200', {
+        'email': fields.String(description='The user email'),
+        'id': fields.Integer(description='The user id')
+    })
+
+    code_400_swg = ns.model('LoginOutput400', {
+        'status': fields.String(example=MISSING_ARGS_ERROR)
+    })
+
+    code_401_swg = ns.model('LoginOutput401', {
+        'status': fields.String(example=WRONG_DATA_ERROR)
+    })
+
+    @ns.expect(body_swg)
+    @ns.marshal_with(code_200_swg, code=200)
+    @ns.response(code=400, description=MISSING_ARGS_ERROR, model=code_400_swg)
+    @ns.response(code=401, description=WRONG_DATA_ERROR, model=code_401_swg)
     def post(self):
         response = requests.post(URL_USERS, json=request.get_json())
         return response.json()
-
-
-api.add_resource(LoginResource, "/users/login")
