@@ -5,7 +5,7 @@ import os
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 
 ns = Namespace(
-    'users/<int:user_id>',
+    'users/<string:user_id>',
     description='One user related operations'
 )
 
