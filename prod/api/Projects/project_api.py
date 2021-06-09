@@ -40,15 +40,15 @@ class ProjectResource(Resource):
         'status': fields.String(example=PROJECT_NOT_FOUND_ERROR)
     })
 
-    @ns.marshal_with(code_200_swg, code=200)
-    @ns.response(404, description=PROJECT_NOT_FOUND_ERROR, model=code_404_swg)
+    @ns.response(200, 'Success', code_200_swg)
+    @ns.response(404, PROJECT_NOT_FOUND_ERROR, code_404_swg)
     def get(self, project_id):
         response = requests.get(URL+project_id)
         return response.json()
 
 
     @ns.expect(body_swg)
-    @ns.marshal_with(code_200_swg, code=200)
+    @ns.response(200, 'Success', code_200_swg)
     def patch(self, project_id):
         response = requests.patch(
             URL+project_id, 
