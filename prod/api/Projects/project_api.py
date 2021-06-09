@@ -1,3 +1,4 @@
+from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
@@ -13,6 +14,16 @@ ns = Namespace(
 @ns.param('project_id', 'The project identifier')
 class ProjectResource(Resource):
     PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
+
+    body_swg = ns.model('NotRequiredProjectInput', {
+        'name': fields.String(description='The project name'),
+        'description': fields.String(description='The project description'),
+        'hashtags': fields.String(description='The project hashtags'),
+        'type': fields.String(description='The project types'),
+        'goal': fields.Integer(description='The project goal'),
+        'endDate': fields.String(description='The project end date'),
+        'location': fields.String(description='The project location')
+    })
 
     code_200_swg = ns.model('ProjectOutput200', {
         'id': fields.Integer(description='The project identifier'),
@@ -33,4 +44,14 @@ class ProjectResource(Resource):
     @ns.response(404, description=PROJECT_NOT_FOUND_ERROR, model=code_404_swg)
     def get(self, project_id):
         response = requests.get(URL+project_id)
+        return response.json()
+
+
+    @ns.expect(body_swg)
+    @ns.marshal_with(code_200_swg, code=200)
+    def patch(self, project_id):
+        response = requests.patch(
+            URL_PROJECTS+project_id, 
+            json=request.get_json()
+        )
         return response.json()
