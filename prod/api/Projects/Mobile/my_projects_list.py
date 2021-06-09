@@ -6,7 +6,7 @@ URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 
 ns = Namespace(
-    'users/<int:user_id>/projects',
+    'users/<string:user_id>/projects',
     description='User projects related operations'
 )
 

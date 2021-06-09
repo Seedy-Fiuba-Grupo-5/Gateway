@@ -5,7 +5,7 @@ import os
 URL = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
 
 ns = Namespace(
-    'projects/<int:project_id>',
+    'projects/<string:project_id>',
     description='Project related operations'
 )
 
@@ -51,7 +51,7 @@ class ProjectResource(Resource):
     @ns.marshal_with(code_200_swg, code=200)
     def patch(self, project_id):
         response = requests.patch(
-            URL_PROJECTS+project_id, 
+            URL+project_id, 
             json=request.get_json()
         )
         return response.json()
