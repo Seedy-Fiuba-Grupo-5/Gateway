@@ -20,8 +20,12 @@ class MyProjectsListResource(Resource):
     def post(self, user_id):
         response = requests.post(URL_PROJECTS, json=request.get_json())
         if response.status_code == 201:
-            requests.post(URL_USERS+user_id+'/projects', json={"project_id": response.json()['id']})
-        return response.json()
+            response = requests.post(URL_USERS+user_id+'/projects', json={"user_id": user_id, "project_id": response.json()['id']})
+            if response.status_code == 201:
+                return response.json()
+            else:
+                return "An error has occurred while associating the project to the user", 404
+        return "An error has occurred while creating the project", 404
 
 
 api.add_resource(MyProjectsListResource, "/users/<user_id>/projects")
