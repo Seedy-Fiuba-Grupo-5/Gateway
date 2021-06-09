@@ -43,14 +43,14 @@ class ProjectsListResource(Resource):
         'status': fields.String(example=MISSING_VALUES_ERROR)
     })
 
-    @ns.marshal_with(code_20x_swg, as_list=True, code=200)
+    @ns.response(202, 'Sucess', fields.List(fields.Nested(code_20x_swg)))
     def get(self):
         response = requests.get(URL_PROJECTS)
         return response.json()
 
     @ns.expect(body_swg)
-    @ns.marshal_with(code_20x_swg, as_list=False, code=201)
-    @ns.response(400, description=MISSING_VALUES_ERROR, model=code_400_swg)
+    @ns.response(201, 'Sucess', code_20x_swg)
+    @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
     def post(self):
         response = requests.post(URL_PROJECTS, json=request.get_json())
         return response.json()

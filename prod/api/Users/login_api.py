@@ -35,9 +35,9 @@ class LoginResource(Resource):
     })
 
     @ns.expect(body_swg)
-    @ns.marshal_with(code_200_swg, code=200)
-    @ns.response(code=400, description=MISSING_ARGS_ERROR, model=code_400_swg)
-    @ns.response(code=401, description=WRONG_DATA_ERROR, model=code_401_swg)
+    @ns.response(200, 'Success', code_200_swg)
+    @ns.response(400, MISSING_ARGS_ERROR, code_400_swg)
+    @ns.response(401, WRONG_DATA_ERROR, code_401_swg)
     def post(self):
         response = requests.post(URL_USERS, json=request.get_json())
         return response.json()
