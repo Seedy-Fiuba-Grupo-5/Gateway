@@ -14,7 +14,7 @@ ns = Namespace(
 @ns.route('')
 @ns.param('user_id', 'The user identifier')
 class UserResource(Resource):
-    USER_NOT_EXIST_ERROR = 'This user does not exists'
+    USER_NOT_FOUND_ERROR = 'user_not_found'
     REPEATED_EMAIL_ERROR = 'repeated_email'
 
     body_swg = ns.model('NotRequiredUserInput', {
@@ -33,7 +33,7 @@ class UserResource(Resource):
     })
 
     code_404_swg = ns.model('UserOutput404', {
-        'status': fields.String(example=USER_NOT_EXIST_ERROR)
+        'status': fields.String(example=USER_NOT_FOUND_ERROR)
     })
 
     code_409_swg = ns.model('UserOutput409', {
@@ -41,7 +41,7 @@ class UserResource(Resource):
     })
 
     @ns.response(200, 'Success', code_200_swg)
-    @ns.response(404, USER_NOT_EXIST_ERROR, code_404_swg)
+    @ns.response(404, USER_NOT_FOUND_ERROR, code_404_swg)
     def get(self, user_id):
         """Get user data"""
         response = requests.get(URL_USERS+user_id)
@@ -49,7 +49,7 @@ class UserResource(Resource):
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)
-    @ns.response(404, USER_NOT_EXIST_ERROR, code_404_swg)
+    @ns.response(404, USER_NOT_FOUND_ERROR, code_404_swg)
     @ns.response(409, REPEATED_EMAIL_ERROR, code_409_swg)
     def patch(self, user_id):
         """Update user data"""
