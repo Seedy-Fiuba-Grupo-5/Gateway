@@ -12,11 +12,10 @@ ns = Namespace(
 
 @ns.route('')
 class UsersListResource(Resource):
-    REGISTER_FIELDS = ("name", "lastName", "email", "password")
-    MISSING_VALUES_ERROR = 'Missing values'
-    REPEATED_USER_ERROR = 'User already registered'
+    MISSING_VALUES_ERROR = 'missing_args'
+    REPEATED_USER_ERROR = 'repeated_email'
 
-    body_swg = ns.model('UserInput', {
+    body_swg = ns.model('One user input', {
         "name": fields.String(required=True, description="The user name"),
         "lastName": fields.String(
             required=True, description="The user last name"),
@@ -24,7 +23,7 @@ class UsersListResource(Resource):
         "active": fields.Boolean(required=True, description="The user status")
     })
 
-    code_20x_swg = ns.model('UserOutput20x', {
+    code_20x_swg = ns.model('One user output 20x', {
         "id": fields.Integer(description='The user id'),
         "name": fields.String(description="The user name"),
         "lastName": fields.String(description="The user last name"),
@@ -32,23 +31,26 @@ class UsersListResource(Resource):
         "active": fields.Boolean(description="The user status")
     })
 
-    code_400_swg = ns.model('AllUserOutput400', {
-        'status': fields.String(example=MISSING_VALUES_ERROR)
+    code_400_swg = ns.model('One user output 400', {
+        'status': fields.String(example=MISSING_VALUES_ERROR),
+        'missing_args': fields.List(fields.String())
     })
 
-    code_401_swg = ns.model('AllUserOutput401', {
+    code_409_swg = ns.model('UserOutput409', {
         'status': fields.String(example=REPEATED_USER_ERROR)
     })
 
-    @ns.response(201, 'Success', fields.List(fields.Nested(code_20x_swg)))
+    @ns.response(200, 'Success', fields.List(fields.Nested(code_20x_swg)))
     def get(self):
+        """Get all users data"""
         response = requests.get(URL_USERS)
         return response.json()
 
     @ns.expect(body_swg)
     @ns.response(201, 'Success', code_20x_swg)
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
-    @ns.response(401, REPEATED_USER_ERROR, code_401_swg)
+    @ns.response(409, 'User already exists', code_409_swg)
     def post(self):
+        """Register new user"""
         response = requests.post(URL_USERS, json=request.get_json())
         return response.json()
