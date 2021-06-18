@@ -1,5 +1,5 @@
 # Requerido en produccion
 Flask==1.1.2
-Flask-RESTful==0.3.8
+flask-restx==0.4.0
 requests==2.25.1
 Flask-Cors==3.0.10
