@@ -65,5 +65,5 @@ class MyProjectsListResource(Resource):
             if response.status_code == 201:
                 return response.json()
             else:
-                return "An error has occurred while associating the project to the user", 404
-        return "An error has occurred while creating the project", 404
+                return "An error has occurred while associating the project to the user", response.status_code
+        return "An error has occurred while creating the project", response.status_code

@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 import requests
 import os
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
+SERVER_ERROR_MESSAGE = "Internal server error, it looks like the Project API is down"
 
 ns = Namespace(
     'projects',
@@ -46,11 +47,15 @@ class ProjectsListResource(Resource):
     @ns.response(202, 'Sucess', fields.List(fields.Nested(code_20x_swg)))
     def get(self):
         response = requests.get(URL_PROJECTS)
-        return response.json()
+        if response:
+            return response.json(), response.status_code
+        return SERVER_ERROR_MESSAGE, 500
 
     @ns.expect(body_swg)
     @ns.response(201, 'Sucess', code_20x_swg)
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
     def post(self):
         response = requests.post(URL_PROJECTS, json=request.get_json())
-        return response.json()
+        if response:
+            return response.json(), response.status_code
+        return SERVER_ERROR_MESSAGE, 500

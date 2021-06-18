@@ -3,7 +3,6 @@ from flask_restx import Namespace, Resource, fields
 import requests
 import os
 URL = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
-
 ns = Namespace(
     'projects/<string:project_id>',
     description='Project related operations'
@@ -44,14 +43,24 @@ class ProjectResource(Resource):
     @ns.response(404, PROJECT_NOT_FOUND_ERROR, code_404_swg)
     def get(self, project_id):
         response = requests.get(URL+project_id)
-        return response.json()
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code < 500:
+                return e.response.json(), e.response.status_code
+            response_body = {"status": str(e)}
+            return response_body, e.response.status_code
+        return response.json(), response.status_code
 
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)
     def patch(self, project_id):
-        response = requests.patch(
-            URL+project_id, 
-            json=request.get_json()
-        )
-        return response.json()
+        try:
+            response = requests.patch(
+                URL+project_id,
+                json=request.get_json()
+            )
+        except requests.exceptions.RequestException as e:
+            ns.abort(e)
+        return response.json(), response.status_code
