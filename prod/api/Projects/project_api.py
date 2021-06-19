@@ -2,6 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
+from prod import api_error_handler
 URL = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
 ns = Namespace(
     'projects/<string:project_id>',
@@ -13,7 +14,7 @@ ns = Namespace(
 @ns.param('project_id', 'The project identifier')
 class ProjectResource(Resource):
     PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
-    SERVER_ERROR = "503 Server Error: Service Unavailable for url: https://seedy-fiuba-backend-projects.herokuapp.com/projects/<project_id>"
+    SERVER_ERROR = "503 Server Error: Service Unavailable for url"
 
     body_swg = ns.model('NotRequiredProjectInput', {
         'name': fields.String(description='The project name'),
@@ -40,7 +41,7 @@ class ProjectResource(Resource):
         'status': fields.String(example=PROJECT_NOT_FOUND_ERROR)
     })
 
-    code_503_swg = ns.model('ProjectOutput404', {
+    code_503_swg = ns.model('ProjectOutput503', {
         'status': fields.String(example=SERVER_ERROR)
     })
 
@@ -49,24 +50,15 @@ class ProjectResource(Resource):
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self, project_id):
         response = requests.get(URL+project_id)
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code < 500:
-                return e.response.json(), e.response.status_code
-            response_body = {"status": str(e)}
-            return response_body, e.response.status_code
-        return response.json(), response.status_code
+        return api_error_handler(response)
 
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)
+    @ns.response(503, SERVER_ERROR, code_503_swg)
     def patch(self, project_id):
-        try:
-            response = requests.patch(
-                URL+project_id,
-                json=request.get_json()
-            )
-        except requests.exceptions.RequestException as e:
-            ns.abort(e)
-        return response.json(), response.status_code
+        response = requests.patch(
+            URL+project_id,
+            json=request.get_json()
+        )
+        return api_error_handler(response)

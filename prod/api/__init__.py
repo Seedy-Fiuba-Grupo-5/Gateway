@@ -43,4 +43,3 @@ api_v1 = Api(
 
 for ns in NAMESPACES:
   api_v1.add_namespace(ns)
-
