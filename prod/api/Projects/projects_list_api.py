@@ -2,6 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
+from prod import api_error_handler
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 
 ns = Namespace(
@@ -13,6 +14,7 @@ ns = Namespace(
 @ns.route('')
 class ProjectsListResource(Resource):
     MISSING_VALUES_ERROR = 'Missing values'
+    SERVER_ERROR = "503 Server Error: Service Unavailable for url"
 
     body_swg = ns.model('ProjectInput', {
         'name': fields.String(required=True, description='The project name'),
@@ -43,14 +45,20 @@ class ProjectsListResource(Resource):
         'status': fields.String(example=MISSING_VALUES_ERROR)
     })
 
+    code_503_swg = ns.model('ProjectOutput5043', {
+        'status': fields.String(example=SERVER_ERROR)
+    })
+
     @ns.response(202, 'Sucess', fields.List(fields.Nested(code_20x_swg)))
+    @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self):
         response = requests.get(URL_PROJECTS)
-        return response.json()
+        return api_error_handler(response)
 
     @ns.expect(body_swg)
     @ns.response(201, 'Sucess', code_20x_swg)
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
+    @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self):
         response = requests.post(URL_PROJECTS, json=request.get_json())
-        return response.json()
+        return api_error_handler(response)
