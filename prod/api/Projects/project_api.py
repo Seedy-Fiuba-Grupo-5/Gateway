@@ -2,8 +2,8 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
+from prod import api_error_handler
 URL = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
-
 ns = Namespace(
     'projects/<string:project_id>',
     description='Project related operations'
@@ -14,6 +14,7 @@ ns = Namespace(
 @ns.param('project_id', 'The project identifier')
 class ProjectResource(Resource):
     PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
+    SERVER_ERROR = "503 Server Error: Service Unavailable for url"
 
     body_swg = ns.model('NotRequiredProjectInput', {
         'name': fields.String(description='The project name'),
@@ -40,18 +41,24 @@ class ProjectResource(Resource):
         'status': fields.String(example=PROJECT_NOT_FOUND_ERROR)
     })
 
+    code_503_swg = ns.model('ProjectOutput503', {
+        'status': fields.String(example=SERVER_ERROR)
+    })
+
     @ns.response(200, 'Success', code_200_swg)
     @ns.response(404, PROJECT_NOT_FOUND_ERROR, code_404_swg)
+    @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self, project_id):
         response = requests.get(URL+project_id)
-        return response.json()
+        return api_error_handler(response)
 
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)
+    @ns.response(503, SERVER_ERROR, code_503_swg)
     def patch(self, project_id):
         response = requests.patch(
-            URL+project_id, 
+            URL+project_id,
             json=request.get_json()
         )
-        return response.json()
+        return api_error_handler(response)
