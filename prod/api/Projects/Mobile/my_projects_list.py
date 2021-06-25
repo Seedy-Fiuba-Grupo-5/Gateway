@@ -72,9 +72,19 @@ class MyProjectsListResource(Resource):
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self, user_id):
-        response = requests.post(URL_PROJECTS, json=request.get_json())
+        data = request.get_json()
+        response = requests.post(URL_USERS+'auth', json={"token": data.get('token'), "id": int(user_id)})
         response_object, status_code = api_error_handler(response)
+        if status_code != 200:
+            return response_object, status_code
+        response = requests.post(URL_PROJECTS, json=data)
+        response_object, status_code = api_error_handler(response)
+        if status_code != 201:
+            return response_object, status_code
+        response = requests.post(URL_USERS + user_id + '/projects', json={"user_id": user_id, "project_id": response.json()['id']})
+        aux, status_code = api_error_handler(response)
         if status_code == 201:
-            response = requests.post(URL_USERS+user_id+'/projects', json={"user_id": user_id, "project_id": response.json()['id']})
-            aux, status_code = api_error_handler(response)
-        return response_object, status_code
+            return response_object, status_code
+        requests.delete(URL_PROJECTS+'/'+response.json()['id'])
+        return aux, status_code
+
