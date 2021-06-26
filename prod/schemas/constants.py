@@ -1,1 +1,1 @@
-INVALID_TOKEN = 'invalid_token'
+INVALID_TOKEN = 'Invalid token => Login again.'
