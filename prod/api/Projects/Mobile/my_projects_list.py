@@ -1,8 +1,11 @@
-from flask import request
 from flask_restx import Namespace, Resource, fields
+from flask import request
 import requests
 import os
 from prod import api_error_handler
+from prod.schemas.invalid_token import invalid_token
+from prod.schemas.constants import INVALID_TOKEN
+
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 
@@ -49,6 +52,7 @@ class MyProjectsListResource(Resource):
     code_503_swg = ns.model('ProjectOutput5043', {
         'status': fields.String(example=SERVER_ERROR)
     })
+    code_401_swg = ns.model(invalid_token.name, invalid_token)
 
     @ns.response(200, 'Success', fields.List(fields.Nested(code_20x_swg)))
     @ns.response(503, SERVER_ERROR, code_503_swg)
@@ -70,6 +74,7 @@ class MyProjectsListResource(Resource):
     @ns.expect(body_swg)
     @ns.response(201, 'Success', code_20x_swg)
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
+    @ns.response(401, INVALID_TOKEN, code_401_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self, user_id):
         data = request.get_json()
