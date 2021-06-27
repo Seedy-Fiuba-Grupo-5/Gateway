@@ -52,13 +52,6 @@ class ProjectsListResource(Resource):
     @ns.response(202, 'Sucess', fields.List(fields.Nested(code_20x_swg)))
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self):
-        response = requests.get(URL_PROJECTS)
+        response = requests.get(URL_PROJECTS, params=request.args)
         return api_error_handler(response)
 
-    @ns.expect(body_swg)
-    @ns.response(201, 'Sucess', code_20x_swg)
-    @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
-    @ns.response(503, SERVER_ERROR, code_503_swg)
-    def post(self):
-        response = requests.post(URL_PROJECTS, json=request.get_json())
-        return api_error_handler(response)

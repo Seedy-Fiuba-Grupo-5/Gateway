@@ -4,7 +4,7 @@ import requests
 import os
 from prod import api_error_handler
 URL = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
-URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
+URL_USERS = os.getenv("USERS_BACKEND_URL")
 ns = Namespace(
     'projects/<string:project_id>',
     description='Project related operations'
@@ -54,7 +54,16 @@ class ProjectResource(Resource):
     @ns.response(200, 'Success', code_200_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def patch(self, project_id):
-        #Falta validar el token, pero necesito el user id.
+        data = request.get_json()
+        response = requests.get(URL_USERS+'/projects/'+project_id, json={"token": data.get('token')})
+        response_body, status_code = api_error_handler(response)
+        if status_code != 200:
+            return response_body, status_code
+        response = requests.post(URL_USERS + '/users/auth',
+                                 json={"token": data.get('token'), "id": response_body.get('user_id')})
+        response_object, status_code = api_error_handler(response)
+        if status_code != 200:
+            return response_object, status_code
         response = requests.patch(
             URL+project_id,
             json=request.get_json()
