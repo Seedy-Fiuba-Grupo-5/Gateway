@@ -1,8 +1,11 @@
-from flask import request
 from flask_restx import Namespace, Resource, fields
+from flask import request
 import requests
 import os
 from prod import api_error_handler
+from prod.schemas.invalid_token import invalid_token
+from prod.schemas.constants import INVALID_TOKEN
+
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 
@@ -49,6 +52,7 @@ class MyProjectsListResource(Resource):
     code_503_swg = ns.model('ProjectOutput5043', {
         'status': fields.String(example=SERVER_ERROR)
     })
+    code_401_swg = ns.model(invalid_token.name, invalid_token)
 
     @ns.response(200, 'Success', fields.List(fields.Nested(code_20x_swg)))
     @ns.response(503, SERVER_ERROR, code_503_swg)
@@ -70,11 +74,22 @@ class MyProjectsListResource(Resource):
     @ns.expect(body_swg)
     @ns.response(201, 'Success', code_20x_swg)
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
+    @ns.response(401, INVALID_TOKEN, code_401_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self, user_id):
-        response = requests.post(URL_PROJECTS, json=request.get_json())
+        data = request.get_json()
+        response = requests.post(URL_USERS+'auth', json={"token": data.get('token'), "id": int(user_id)})
         response_object, status_code = api_error_handler(response)
+        if status_code != 200:
+            return response_object, status_code
+        response = requests.post(URL_PROJECTS, json=data)
+        response_object, status_code = api_error_handler(response)
+        if status_code != 201:
+            return response_object, status_code
+        response = requests.post(URL_USERS + user_id + '/projects', json={"user_id": user_id, "project_id": response.json()['id']})
+        aux, status_code = api_error_handler(response)
         if status_code == 201:
-            response = requests.post(URL_USERS+user_id+'/projects', json={"user_id": user_id, "project_id": response.json()['id']})
-            aux, status_code = api_error_handler(response)
-        return response_object, status_code
+            return response_object, status_code
+        requests.delete(URL_PROJECTS+'/'+response.json()['id'])
+        return aux, status_code
+
