@@ -1,6 +1,8 @@
 import os
 from flask import Flask
 import requests
+import firebase_admin
+from firebase_admin import credentials
 
 def create_app(script_info=None):
     # App 'Factory'
@@ -10,8 +12,15 @@ def create_app(script_info=None):
 
     import_blueprints(app)
 
+    create_firebase_app()
+
     return app
 
+def create_firebase_app():
+    cred = credentials.Certificate('prod/api/firebaseKey.json')
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://seedyfiuba-a983e-default-rtdb.firebaseio.com/"
+    })
 
 def import_blueprints(app):
     from .api import api_base_bp, api_v1_bp

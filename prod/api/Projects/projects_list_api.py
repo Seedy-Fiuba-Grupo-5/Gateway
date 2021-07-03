@@ -2,6 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
+from firebase_admin import db
 from prod import api_error_handler
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 
@@ -61,4 +62,8 @@ class ProjectsListResource(Resource):
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self):
         response = requests.post(URL_PROJECTS, json=request.get_json())
-        return api_error_handler(response)
+        response, status_code = api_error_handler(response)
+        if status_code != 201:
+            return response, status_code
+        ref = db.reference('projects/'+str(response['id'])+'/images')
+        return ref.get()
