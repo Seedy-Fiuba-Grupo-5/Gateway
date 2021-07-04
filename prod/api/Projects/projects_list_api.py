@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
-from firebase_admin import db
+from google.cloud import storage
 from prod import api_error_handler
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 
@@ -30,7 +30,6 @@ class ProjectsListResource(Resource):
         'location': fields.String(
             required=True, description='The project location')
     })
-
     code_20x_swg = ns.model('ProjectOutput20x', {
         'id': fields.Integer(description='The project identifier'),
         'name': fields.String(description='The project name'),
@@ -41,29 +40,32 @@ class ProjectsListResource(Resource):
         'endDate': fields.String(description='The project end date'),
         'location': fields.String(description='The project location')
     })
-
     code_400_swg = ns.model('ProjectOutput400', {
         'status': fields.String(example=MISSING_VALUES_ERROR)
     })
-
     code_503_swg = ns.model('ProjectOutput5043', {
         'status': fields.String(example=SERVER_ERROR)
     })
 
-    @ns.response(202, 'Sucess', fields.List(fields.Nested(code_20x_swg)))
+    @ns.response(202, 'Success', fields.List(fields.Nested(code_20x_swg)))
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self):
         response = requests.get(URL_PROJECTS)
         return api_error_handler(response)
 
     @ns.expect(body_swg)
-    @ns.response(201, 'Sucess', code_20x_swg)
+    @ns.response(201, 'Success', code_20x_swg)
     @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self):
         response = requests.post(URL_PROJECTS, json=request.get_json())
         response, status_code = api_error_handler(response)
-        if status_code != 201:
-            return response, status_code
-        ref = db.reference('projects/'+str(response['id'])+'/images')
-        return ref.get()
+        #if status_code != 201:
+        return response, status_code
+        '''
+        client = storage.Client()
+        bucket = client.get_bucket('seedyfiuba-a983e.appspot.com')
+        folderBlob = bucket.blob("/testDiego")
+        return folderBlob.upload_from_string(data="")
+        '''
+

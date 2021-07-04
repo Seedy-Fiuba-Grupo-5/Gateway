@@ -17,9 +17,10 @@ def create_app(script_info=None):
     return app
 
 def create_firebase_app():
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "prod/api/firebaseKey.json"
     cred = credentials.Certificate('prod/api/firebaseKey.json')
     firebase_admin.initialize_app(cred, {
-        'databaseURL': "https://seedyfiuba-a983e-default-rtdb.firebaseio.com/"
+        'storageBucket': "gs://seedyfiuba-a983e.appspot.com"
     })
 
 def import_blueprints(app):
