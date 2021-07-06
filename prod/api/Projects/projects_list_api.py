@@ -50,25 +50,5 @@ class ProjectsListResource(Resource):
     @ns.response(202, 'Success', fields.List(fields.Nested(code_20x_swg)))
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self):
-        response = requests.get(URL_PROJECTS)
-        return api_error_handler(response)
-
-    @ns.expect(body_swg)
-    @ns.response(201, 'Success', code_20x_swg)
-    @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
-    @ns.response(503, SERVER_ERROR, code_503_swg)
-    def post(self):
-        response = requests.post(URL_PROJECTS, json=request.get_json())
-        response, status_code = api_error_handler(response)
-        if status_code != 201:
-            return response, status_code
-        client = storage.Client()
-        bucket = client.get_bucket('seedyfiuba-a983e.appspot.com')
-        path = os.path.abspath(os.getcwd())
-        imagePath = path + "/prod/api/Projects/default.jpg"
-        storagePath = "projects/"+str(response['id'])+"/images/"
-        imageBlob = bucket.blob(storagePath+"default.jpg")
-        imageBlob.upload_from_filename(imagePath)
-        patch = {"image": storagePath}
-        response = requests.patch(URL_PROJECTS + '/' + str(response['id']), json=patch)
+        response = requests.get(URL_PROJECTS, params=request.args)
         return api_error_handler(response)
