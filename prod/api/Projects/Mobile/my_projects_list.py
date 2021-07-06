@@ -3,6 +3,7 @@ from flask import request
 import requests
 import os
 from prod import api_error_handler
+from google.cloud import storage
 from prod.schemas.invalid_token import invalid_token
 from prod.schemas.constants import INVALID_TOKEN
 
@@ -77,19 +78,41 @@ class MyProjectsListResource(Resource):
     @ns.response(401, INVALID_TOKEN, code_401_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self, user_id):
-        data = request.get_json()
-        response = requests.post(URL_USERS+'auth', json={"token": data.get('token'), "id": int(user_id)})
-        response_object, status_code = api_error_handler(response)
-        if status_code != 200:
-            return response_object, status_code
-        response = requests.post(URL_PROJECTS, json=data)
-        response_object, status_code = api_error_handler(response)
-        if status_code != 201:
-            return response_object, status_code
-        response = requests.post(URL_USERS + user_id + '/projects', json={"user_id": user_id, "project_id": response.json()['id']})
-        aux, status_code = api_error_handler(response)
-        if status_code == 201:
-            return response_object, status_code
-        requests.delete(URL_PROJECTS+'/'+response.json()['id'])
-        return aux, status_code
+        token_json, token_status_code = self.validate_token(user_id)
+        if token_status_code != 200:
+            return token_json, token_status_code
+        project_json, project_status_code = self.create_project()
+        if project_status_code != 201:
+            return project_json, project_status_code
+        user_json, user_status_code = self.add_project_to_user(user_id, project_json['id'])
+        if user_status_code != 201:
+            requests.delete(URL_PROJECTS + '/' + project_json['id'])
+            return user_json, user_status_code
+        return self.create_firebase_directory(project_json['id'])
 
+    def validate_token(self, user_id):
+        data = request.get_json()
+        response = requests.post(URL_USERS + 'auth', json={"token": data.get('token'), "id": int(user_id)})
+        return api_error_handler(response)
+
+    def create_project(self):
+        data = request.get_json()
+        response = requests.post(URL_PROJECTS, json=data)
+        return api_error_handler(response)
+
+    def add_project_to_user(self, user_id, project_id):
+        response = requests.post(URL_USERS + user_id + '/projects',
+                                 json={"user_id": user_id, "project_id": project_id})
+        return api_error_handler(response)
+
+    def create_firebase_directory(self, project_id):
+        client = storage.Client()
+        bucket = client.get_bucket('seedyfiuba-a983e.appspot.com')
+        path = os.path.abspath(os.getcwd())
+        imagePath = path + "/prod/api/Projects/default.jpg"
+        storagePath = "projects/" + str(project_id) + "/images/"
+        imageBlob = bucket.blob(storagePath + "default.jpg")
+        imageBlob.upload_from_filename(imagePath)
+        patch = {"image": storagePath}
+        response = requests.patch(URL_PROJECTS + '/' + str(project_id), json=patch)
+        return api_error_handler(response)

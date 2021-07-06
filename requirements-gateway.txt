@@ -3,3 +3,5 @@ Flask==1.1.2
 flask-restx==0.4.0
 requests==2.25.1
 Flask-Cors==3.0.10
+firebase_admin==5.0.1
+google-cloud-storage==1.40.0
