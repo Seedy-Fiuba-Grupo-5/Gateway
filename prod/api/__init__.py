@@ -12,6 +12,7 @@ from .Users.login_api import ns as login_ns
 from .Users.user_api import ns as user_ns
 from .Users.user_list_api import ns as user_list_ns
 from .Users.admin_block_user_api import ns as admin_block_user_ns
+from .service_api import ns as services_ns
 
 NAMESPACES = (
   my_projects_list_ns,
@@ -23,7 +24,8 @@ NAMESPACES = (
   admins_list_ns,
   admins_login_ns,
   admin_ns,
-  admin_block_user_ns
+  admin_block_user_ns,
+  services_ns
 )
 
 # Base API
