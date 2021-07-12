@@ -46,8 +46,18 @@ class ProjectResource(Resource):
     @ns.response(404, PROJECT_NOT_FOUND_ERROR, code_404_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self, project_id):
+        data = request.get_json()
         response = requests.get(URL+project_id)
-        return api_error_handler(response)
+        project_response_body, project_status_code = api_error_handler(response)
+        if project_status_code != 200:
+            return project_response_body, project_status_code
+        user_response_body, user_status_code = self.get_project_owner(project_id, data.get('token'))
+        if user_status_code == 200:
+            response = requests.get(URL_USERS + '/users/' + str(user_response_body['user_id']), json={"token": data.get('token')})
+            user_response_body, user_status_code = api_error_handler(response)
+            if user_status_code == 200:
+                project_response_body['user'] = user_response_body
+        return project_response_body, project_status_code
 
 
     @ns.expect(body_swg)
@@ -55,8 +65,7 @@ class ProjectResource(Resource):
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def patch(self, project_id):
         data = request.get_json()
-        response = requests.get(URL_USERS+'/projects/'+project_id, json={"token": data.get('token')})
-        response_body, status_code = api_error_handler(response)
+        response_body, status_code = self.get_project_owner(project_id, data.get('token'))
         if status_code != 200:
             return response_body, status_code
         response = requests.post(URL_USERS + '/users/auth',
@@ -69,3 +78,8 @@ class ProjectResource(Resource):
             json=request.get_json()
         )
         return api_error_handler(response)
+
+    def get_project_owner(self, project_id, token):
+        response = requests.get(URL_USERS + '/projects/' + project_id, json={"token": token})
+        return api_error_handler(response)
+
