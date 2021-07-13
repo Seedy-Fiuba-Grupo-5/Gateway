@@ -59,3 +59,12 @@ class UserResource(Resource):
         """Update user data"""
         response = requests.post(URL_USERS + user_id, json=request.get_json())
         return api_error_handler(response)
+
+    @ns.expect(body_swg)
+    @ns.response(200, 'Success', code_200_swg)
+    @ns.response(404, USER_NOT_FOUND_ERROR, code_404_swg)
+    @ns.response(503, SERVER_ERROR, code_503_swg)
+    def delete(self, user_id):
+        """Update user data"""
+        response = requests.delete(URL_USERS + user_id, json=request.get_json())
+        return api_error_handler(response)
