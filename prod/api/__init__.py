@@ -13,19 +13,21 @@ from .Users.user_api import ns as user_ns
 from .Users.user_list_api import ns as user_list_ns
 from .Users.admin_block_user_api import ns as admin_block_user_ns
 from .service_api import ns as services_ns
+from .Users.seers_api import ns as seers_ns
 
 NAMESPACES = (
-  my_projects_list_ns,
-  project_ns,
-  projects_list_ns,
-  login_ns,
-  user_ns,
-  user_list_ns,
-  admins_list_ns,
-  admins_login_ns,
-  admin_ns,
-  admin_block_user_ns,
-  services_ns
+    my_projects_list_ns,
+    project_ns,
+    projects_list_ns,
+    login_ns,
+    user_ns,
+    user_list_ns,
+    admins_list_ns,
+    admins_login_ns,
+    admin_ns,
+    admin_block_user_ns,
+    services_ns,
+    seers_ns
 )
 
 # Base API
