@@ -49,6 +49,7 @@ class UserResource(Resource):
     def patch(self, user_id):
         """Update user data"""
         response = requests.patch(URL_USERS+user_id, json=request.get_json())
+        #Aca iria lo de payments para asignar el veedor.
         return api_error_handler(response)
 
     @ns.expect(body_swg)

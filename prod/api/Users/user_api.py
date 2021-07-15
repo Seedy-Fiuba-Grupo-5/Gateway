@@ -5,6 +5,7 @@ import os
 from prod import api_error_handler
 
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
+URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/wallets/"
 
 ns = Namespace(
     'users/<string:user_id>',
@@ -47,8 +48,22 @@ class UserResource(Resource):
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self, user_id):
         """Get user data"""
-        response = requests.get(URL_USERS+user_id)
-        return api_error_handler(response)
+        data = request.get_json()
+        response = requests.get(URL_USERS + user_id)
+        user_body, user_status_code = api_error_handler(response)
+        if user_status_code is not 200:
+            return user_body, user_status_code
+        response = requests.post(URL_USERS + 'auth', json={"token": data.get('token'), "id": int(user_id)})
+        auth_body, auth_status_code = api_error_handler(response)
+        if auth_status_code is 200:
+            response = requests.get(URL_PAYMENTS + user_id,
+                                    headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'})
+            payments_body, payments_status_code = api_error_handler(response)
+            if payments_status_code is 200:
+                user_body["address"] = payments_body["address"]
+                user_body["privateKey"] = payments_body["privateKey"]
+                user_body["balance"] = payments_body["balance"]
+        return user_body, user_status_code
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)

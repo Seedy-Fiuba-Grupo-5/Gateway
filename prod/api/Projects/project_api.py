@@ -57,6 +57,7 @@ class ProjectResource(Resource):
             user_response_body, user_status_code = api_error_handler(response)
             if user_status_code == 200:
                 project_response_body['user'] = user_response_body
+        #falta agregar payments aca para que devuelva los datos del proyecto
         return project_response_body, project_status_code
 
 

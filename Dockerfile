@@ -1,6 +1,6 @@
 # Dockerfile para produccion
 
-# Imagen base de python 
+# Imagen base de python
 FROM python:3.8
 
 # Directorio de trabajo
@@ -20,7 +20,7 @@ COPY ./prod /usr/src/app/prod
 # Indica al inteprete de Python que no genere archivos .pyc
 ENV PYTHONDONTWRITEBYTECODE 1
 
-# Indica a Python que su salida estandar se envie directamente 
+# Indica a Python que su salida estandar se envie directamente
 # a la terminal, sin esperar en un buffer intermedio.
 ENV PYTHONUNBUFFERED 1
 
@@ -33,6 +33,7 @@ ENV FLASK_APP=./prod/manage
 # Indica las urls de los servicios backends
 ENV PROJECTS_BACKEND_URL='https://seedy-fiuba-backend-projects.herokuapp.com'
 ENV USERS_BACKEND_URL='https://seedy-fiuba-backend-users.herokuapp.com'
+ENV PAYMENTS_BACKEND_URL='https://seedy-fiuba-backend-payments.herokuapp.com'
 
 # Ejecutar el script entrypoint.sh
 ENTRYPOINT ["sh", "/usr/src/app/prod/entrypoint.sh"]
