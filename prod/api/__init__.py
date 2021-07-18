@@ -5,16 +5,16 @@ from flask_restx import Api
 from .Projects.Mobile.my_projects_list import ns as my_projects_list_ns
 from .Projects.project_api import ns as project_ns
 from .Projects.projects_list_api import ns as projects_list_ns
-from .Users.admins_list_api import ns as admins_list_ns
-from .Users.admins_login_api import ns as admins_login_ns
-from .Users.admin_api import ns as admin_ns
+from prod.api.Admins.admins_list_api import ns as admins_list_ns
+from prod.api.Admins.admins_login_api import ns as admins_login_ns
+from prod.api.Admins.admin_api import ns as admin_ns
 from .Users.login_api import ns as login_ns
 from .Users.user_api import ns as user_ns
 from .Users.user_list_api import ns as user_list_ns
-from .Users.admin_block_user_api import ns as admin_block_user_ns
+from prod.api.Admins.admin_block_user_api import ns as admin_block_user_ns
 from .service_api import ns as services_ns
 from .Users.seers_api import ns as seers_ns
-
+from .Users.users_metrics_api import ns as users_metrics_ns
 NAMESPACES = (
     my_projects_list_ns,
     project_ns,
@@ -27,7 +27,8 @@ NAMESPACES = (
     admin_ns,
     admin_block_user_ns,
     services_ns,
-    seers_ns
+    seers_ns,
+    users_metrics_ns
 )
 
 # Base API

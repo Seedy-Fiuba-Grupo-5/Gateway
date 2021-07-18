@@ -53,7 +53,6 @@ class UserResource(Resource):
         user_body, user_status_code = api_error_handler(response)
         if user_status_code != 200:
             return user_body, user_status_code
-        token = None
         if data is None:
             token = request.args.get('token')
         else:
