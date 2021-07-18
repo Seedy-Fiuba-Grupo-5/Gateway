@@ -51,15 +51,15 @@ class UserResource(Resource):
         data = request.get_json()
         response = requests.get(URL_USERS + user_id)
         user_body, user_status_code = api_error_handler(response)
-        if user_status_code is not 200:
+        if user_status_code != 200:
             return user_body, user_status_code
         response = requests.post(URL_USERS + 'auth', json={"token": data.get('token'), "id": int(user_id)})
         auth_body, auth_status_code = api_error_handler(response)
-        if auth_status_code is 200:
+        if auth_status_code == 200:
             response = requests.get(URL_PAYMENTS + user_id,
                                     headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'})
             payments_body, payments_status_code = api_error_handler(response)
-            if payments_status_code is 200:
+            if payments_status_code == 200:
                 user_body["address"] = payments_body["address"]
                 user_body["privateKey"] = payments_body["privateKey"]
                 user_body["balance"] = payments_body["balance"]
