@@ -47,13 +47,18 @@ class ProjectResource(Resource):
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self, project_id):
         data = request.get_json()
+        token = None
+        if data is None:
+            token = request.args.get('token')
+        else:
+            token = data.get('token')
         response = requests.get(URL+project_id)
         project_response_body, project_status_code = api_error_handler(response)
         if project_status_code != 200:
             return project_response_body, project_status_code
-        user_response_body, user_status_code = self.get_project_owner(project_id, data.get('token'))
+        user_response_body, user_status_code = self.get_project_owner(project_id, token)
         if user_status_code == 200:
-            response = requests.get(URL_USERS + '/users/' + str(user_response_body['user_id']), json={"token": data.get('token')})
+            response = requests.get(URL_USERS + '/users/' + str(user_response_body['user_id']), json={"token": token})
             user_response_body, user_status_code = api_error_handler(response)
             if user_status_code == 200:
                 project_response_body['user'] = user_response_body
