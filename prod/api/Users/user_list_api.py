@@ -4,6 +4,7 @@ import requests
 import os
 from prod import api_error_handler
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users"
+URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/wallets"
 
 ns = Namespace(
     name='users',
@@ -57,4 +58,15 @@ class UsersListResource(Resource):
     def post(self):
         """Register new user"""
         response = requests.post(URL_USERS, json=request.get_json())
-        return api_error_handler(response)
+        user_body, user_status_code = api_error_handler(response)
+        if user_status_code != 201:
+            return user_body, user_status_code
+        response = requests.post(URL_PAYMENTS,
+                                 headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'},
+                                 json={"publicId": user_body.get("id")})
+        payments_body, payments_status_code = api_error_handler(response)
+        if payments_status_code != 201:
+            return payments_body, payments_status_code
+        user_body["address"] = payments_body["address"]
+        user_body["privateKey"] = payments_body["privateKey"]
+        return user_body, user_status_code

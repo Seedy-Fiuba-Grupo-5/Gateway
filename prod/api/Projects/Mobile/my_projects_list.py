@@ -9,6 +9,7 @@ from prod.schemas.constants import INVALID_TOKEN
 
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
+URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects"
 
 ns = Namespace(
     'users/<string:user_id>/projects',
@@ -36,7 +37,6 @@ class MyProjectsListResource(Resource):
         'location': fields.String(
             required=True, description='The project location')
     })
-
     code_20x_swg = ns.model('ProjectOutput200', {
         'id': fields.Integer(description='The project identifier'),
         'name': fields.String(description='The project name'),
@@ -88,7 +88,15 @@ class MyProjectsListResource(Resource):
         if user_status_code != 201:
             requests.delete(URL_PROJECTS + '/' + project_json['id'])
             return user_json, user_status_code
+        self.create_project_wallet(user_id, project_json.get('id'), project_json.get('goal'))
         return self.create_firebase_directory(project_json['id'])
+
+    def create_project_wallet(self, user_id, project_id, project_goal):
+        response = requests.post(URL_PAYMENTS,
+                                 headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'},
+                                 json={"publicId": project_id, "ownerPublicId": user_id, "reviewerPublicId": None,
+                                       "stagesCost": [project_goal]})
+        return api_error_handler(response)
 
     def validate_token(self, user_id):
         data = request.get_json()
@@ -113,6 +121,6 @@ class MyProjectsListResource(Resource):
         storagePath = "projects/" + str(project_id) + "/images/"
         imageBlob = bucket.blob(storagePath + "default.jpg")
         imageBlob.upload_from_filename(imagePath)
-        patch = {"image": storagePath}
+        patch = {"path": storagePath}
         response = requests.patch(URL_PROJECTS + '/' + str(project_id), json=patch)
         return api_error_handler(response)

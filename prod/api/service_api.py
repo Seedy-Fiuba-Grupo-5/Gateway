@@ -1,11 +1,11 @@
-import json
-
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
 from prod import api_error_handler
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL")
 URL_USERS = os.getenv("USERS_BACKEND_URL")
+URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL")
+
 ns = Namespace(
     'services',
     description='Service status validation'
@@ -26,6 +26,7 @@ class ProjectResource(Resource):
         response_body = []
         response_body.append(self.check_backend_projects())
         response_body.append(self.check_backend_users())
+        response_body.append(self.check_backend_payments())
         return response_body, 200
 
     def check_backend_projects(self):
@@ -41,5 +42,13 @@ class ProjectResource(Resource):
         if response_status < 500:
             return {'service': 'Backend Users', 'url': URL_USERS, 'status': 'Active'}
         return {'service': 'Backend Users', 'url': URL_USERS, 'status': 'Inactive'}
+
+    def check_backend_payments(self):
+        response = requests.get(URL_PAYMENTS + "/wallets",
+                                headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'})
+        response_body, response_status = api_error_handler(response)
+        if response_status < 500:
+            return {'service': 'Backend Payments', 'url': URL_PAYMENTS, 'status': 'Active'}
+        return {'service': 'Backend Payments', 'url': URL_PAYMENTS, 'status': 'Inactive'}
 
 
