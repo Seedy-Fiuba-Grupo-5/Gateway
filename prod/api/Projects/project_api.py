@@ -4,7 +4,9 @@ import requests
 import os
 from prod import api_error_handler
 URL = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
+PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_USERS = os.getenv("USERS_BACKEND_URL")
+URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects/"
 ns = Namespace(
     'projects/<string:project_id>',
     description='Project related operations'
@@ -62,7 +64,10 @@ class ProjectResource(Resource):
             user_response_body, user_status_code = api_error_handler(response)
             if user_status_code == 200:
                 project_response_body['user'] = user_response_body
-        #falta agregar payments aca para que devuelva los datos del proyecto
+        response = requests.get(URL_PAYMENTS+project_id, headers={"Authorization": PAYMENTS_API_KEY})
+        payments_body, payments_status = api_error_handler(response)
+        if payments_status == 200:
+            project_response_body["payments"] = payments_body
         return project_response_body, project_status_code
 
 

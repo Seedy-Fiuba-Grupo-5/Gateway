@@ -4,6 +4,7 @@ import requests
 import os
 from prod import api_error_handler
 
+PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/wallets/"
 
@@ -61,7 +62,7 @@ class UserResource(Resource):
         auth_body, auth_status_code = api_error_handler(response)
         if auth_status_code == 200:
             response = requests.get(URL_PAYMENTS + user_id,
-                                    headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'})
+                                    headers={"Authorization": PAYMENTS_API_KEY})
             payments_body, payments_status_code = api_error_handler(response)
             if payments_status_code == 200:
                 user_body["address"] = payments_body["address"]
