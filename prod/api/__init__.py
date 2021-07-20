@@ -17,6 +17,7 @@ from .Users.seers_api import ns as seers_ns
 from .Users.users_metrics_api import ns as users_metrics_ns
 from .Projects.projects_metrics_api import ns as projects_metrics_ns
 from .Users.user_messages_api import ns as messages_ns
+from .Projects.Mobile.favourite_projects_api import ns as favorites_ns
 
 NAMESPACES = (
     my_projects_list_ns,
@@ -33,7 +34,8 @@ NAMESPACES = (
     seers_ns,
     users_metrics_ns,
     projects_metrics_ns,
-    messages_ns
+    messages_ns,
+    favorites_ns
 )
 
 # Base API
