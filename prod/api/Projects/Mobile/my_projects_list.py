@@ -6,6 +6,7 @@ from prod import api_error_handler
 from google.cloud import storage
 from prod.schemas.invalid_token import invalid_token
 from prod.schemas.constants import INVALID_TOKEN
+import logging
 
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
@@ -78,6 +79,8 @@ class MyProjectsListResource(Resource):
     @ns.response(401, INVALID_TOKEN, code_401_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self, user_id):
+        data = request.get_json()
+        stages_cost = data.get('stagesCost');
         token_json, token_status_code = self.validate_token(user_id)
         if token_status_code != 200:
             return token_json, token_status_code
@@ -88,14 +91,14 @@ class MyProjectsListResource(Resource):
         if user_status_code != 201:
             requests.delete(URL_PROJECTS + '/' + project_json['id'])
             return user_json, user_status_code
-        self.create_project_wallet(user_id, project_json.get('id'), project_json.get('goal'))
+        self.create_project_wallet(user_id, project_json.get('id'), stages_cost)
         return self.create_firebase_directory(project_json['id'])
 
-    def create_project_wallet(self, user_id, project_id, project_goal):
+    def create_project_wallet(self, user_id, project_id, stages_cost):
         response = requests.post(URL_PAYMENTS,
                                  headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'},
                                  json={"publicId": project_id, "ownerPublicId": user_id, "reviewerPublicId": None,
-                                       "stagesCost": [project_goal]})
+                                       "stagesCost": stages_cost})
         return api_error_handler(response)
 
     def validate_token(self, user_id):
