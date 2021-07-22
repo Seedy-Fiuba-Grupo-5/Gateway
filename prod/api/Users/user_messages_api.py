@@ -38,8 +38,10 @@ class UsersListResource(Resource):
         """Get all users data"""
         data = request.get_json()
         if data is None:
-            data["token"] = request.args.get('token')
-        response = requests.get(URL_USERS+user_id, json=data)
+            token = request.args.get('token')
+        else:
+            token = data["token"]
+        response = requests.get(URL_USERS+user_id, json={"token": token})
         return api_error_handler(response)
 
     @ns.expect(body_swg)
