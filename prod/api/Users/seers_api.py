@@ -4,7 +4,9 @@ import requests
 import os
 from prod import api_error_handler
 
+PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/seers/"
+URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects/"
 
 ns = Namespace(
     'seers/<string:user_id>',
@@ -15,6 +17,7 @@ ns = Namespace(
 @ns.route('')
 @ns.param('user_id', 'The user identifier')
 class UserResource(Resource):
+    PROJECT_MINING = 'The project is being mined'
     USER_NOT_FOUND_ERROR = 'user_not_found'
     SERVER_ERROR = "503 Server Error: Service Unavailable for url"
 
@@ -48,9 +51,21 @@ class UserResource(Resource):
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def patch(self, user_id):
         """Update user data"""
-        response = requests.patch(URL_USERS+user_id, json=request.get_json())
-        #Aca iria lo de payments para asignar el veedor.
-        return api_error_handler(response)
+        first_data = request.get_json()
+        project_id = first_data.get('project_id')
+        response = requests.patch(URL_USERS+user_id, json=first_data)
+        response_object, status_code = api_error_handler(response)
+        if status_code != 200:
+            return response_object, status_code
+        url = URL_PAYMENTS+str(project_id)
+        response = requests.patch(
+            url,
+            headers={"Authorization": PAYMENTS_API_KEY},
+            json={'reviewerPublicId': user_id})
+        response_pay, status_pay = api_error_handler(response)
+        if status_pay != 202:
+            return response_pay, status_pay
+        return response_object, status_code
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)
