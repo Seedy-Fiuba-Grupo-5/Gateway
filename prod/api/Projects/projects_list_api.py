@@ -2,7 +2,6 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 import requests
 import os
-from google.cloud import storage
 from prod import api_error_handler
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 
