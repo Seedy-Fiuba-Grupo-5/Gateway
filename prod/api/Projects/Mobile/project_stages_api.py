@@ -9,8 +9,8 @@ URL_USERS = os.getenv("USERS_BACKEND_URL")
 URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects/"
 
 ns = Namespace(
-    'projects/<string:project_id>/funds',
-    description='Project funds related operations'
+    'projects/<string:project_id>/stages',
+    description='Project stages related operations'
 )
 
 @ns.route('')
@@ -19,18 +19,18 @@ class ProjectResource(Resource):
     SUCCESS = 'Transaction being mined'
     PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
     SERVER_ERROR = "503 Server Error: Service Unavailable for url"
-    body_swg = ns.model('Project_Fund_Payload', {
-        'userPublicId': fields.Integer(description='The user id who wants to fund'),
-        'amountEthers': fields.String(description='The amount of ethers to fund')
+    body_swg = ns.model('Project_stages_payload', {
+        'reviewerPublicId': fields.Integer(description='The reviewer id who wants to set a stage completed'),
+        'stageNumber': fields.String(description='The number of the stage to set completed (starting from number 1)')
     })
-    code_202_swg = ns.model('Project_Funded_Success', {
+    code_202_swg = ns.model('Project_Set_Completed_Stage_Success', {
         'id': fields.Integer(description='The transaction Id'),
-        'amountEthers': fields.String(description='The amount of ethers fund'),
-        'fromPublicId': fields.String(description='The id of the user funder'),
-        'fromType': fields.String(example='user'),
-        'toPublicId': fields.String(description='The id of the project being fund'),
+        'amountEthers': fields.String(description='The amount of ethers release'),
+        'fromPublicId': fields.String(description='The id of the project where funds comes from'),
+        'fromType': fields.String(example='project'),
+        'toPublicId': fields.String(description='The id of the user reviewer'),
         'toType': fields.String(example='project'),
-        'transactionType': fields.String(example='fund'),
+        'transactionType': fields.String(example='stageCompleted'),
         'transationState': fields.String(example='mining / done'),
         'token': fields.String(description='Updated token')
     })
@@ -45,15 +45,15 @@ class ProjectResource(Resource):
     def post(self, project_id):
         first_data = request.get_json()
         token = request.args.get('token')
-        user_id = first_data.get('userPublicId')
-        amount_ethers = first_data.get('amountEthers')
+        user_id = first_data.get('reviewerPublicId')
+        stage_number = first_data.get('stageNumber')
         response = requests.post(URL_USERS + '/users/auth',
                                  json={"token": token, "id": user_id})
         response_object, status_code = api_error_handler(response)
         if status_code != 200:
             return response_object, status_code
         new_token = response_object['token']
-        url = URL_PAYMENTS+project_id+'/funds'
+        url = URL_PAYMENTS+project_id+'/stages'
         response = requests.post(
             url,
             headers={"Authorization": PAYMENTS_API_KEY},

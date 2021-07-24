@@ -8,6 +8,7 @@ from prod.schemas.invalid_token import invalid_token
 from prod.schemas.constants import INVALID_TOKEN
 import logging
 
+PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects"
@@ -96,8 +97,8 @@ class MyProjectsListResource(Resource):
 
     def create_project_wallet(self, user_id, project_id, stages_cost):
         response = requests.post(URL_PAYMENTS,
-                                 headers={"Authorization": 'Bearer e67d2be7-91fe-47ce-8c15-5f726526ae07'},
-                                 json={"publicId": project_id, "ownerPublicId": user_id, "reviewerPublicId": None,
+                                 headers={"Authorization": PAYMENTS_API_KEY},
+                                 json={"publicId": project_id, "ownerPublicId": user_id, "reviewerPublicId": -1,
                                        "stagesCost": stages_cost})
         return api_error_handler(response)
 

@@ -44,6 +44,7 @@ class ProjectResource(Resource):
         'status': fields.String(example=SERVER_ERROR)
     })
 
+    @ns.doc(params={'token': {'in': 'query', 'type': 'string'}})
     @ns.response(200, 'Success', code_200_swg)
     @ns.response(404, PROJECT_NOT_FOUND_ERROR, code_404_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
