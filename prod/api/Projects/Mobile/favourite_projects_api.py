@@ -6,7 +6,7 @@ from prod import api_error_handler
 from prod.schemas.invalid_token import invalid_token
 from prod.schemas.constants import INVALID_TOKEN
 
-URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
+URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects/"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 
 ns = Namespace(
@@ -68,7 +68,12 @@ class MyProjectsListResource(Resource):
     @ns.response(401, INVALID_TOKEN, code_401_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def post(self, user_id):
-        response = requests.post(URL_USERS+user_id+'/favorites', json=request.get_json())
+        data = request.get_json()
+        response = requests.post(URL_USERS+user_id+'/favorites', json=data)
+        users_body, users_status_code = api_error_handler(response)
+        if users_status_code != 201:
+            return users_body, users_status_code
+        response = requests.post(URL_PROJECTS+str(data["project_id"])+'/favorites', json={"user_id": user_id})
         return api_error_handler(response)
 
     @ns.expect(body_swg)
@@ -77,5 +82,10 @@ class MyProjectsListResource(Resource):
     @ns.response(401, INVALID_TOKEN, code_401_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def delete(self, user_id):
-        response = requests.delete(URL_USERS+user_id+'/favorites', json=request.get_json())
+        data = request.get_json()
+        response = requests.delete(URL_USERS+user_id+'/favorites', json=data)
+        users_body, users_status_code = api_error_handler(response)
+        if users_status_code != 200:
+            return users_body, users_status_code
+        response = requests.delete(URL_PROJECTS + str(data["project_id"]) + '/favorites', json={"user_id": user_id})
         return api_error_handler(response)

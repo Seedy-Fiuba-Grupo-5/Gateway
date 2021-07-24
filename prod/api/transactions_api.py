@@ -13,7 +13,7 @@ ns = Namespace(
 
 
 @ns.route('')
-class ProjectResource(Resource):
+class TransactionResource(Resource):
     SERVER_ERROR = "503 Server Error: Service Unavailable for url"
     code_200_swg = ns.model('TransactionsOutput', {
         'amountEthers': fields.String(description='The amount of ethers'),
