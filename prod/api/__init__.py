@@ -22,6 +22,7 @@ from .Projects.Mobile.project_fund_api import ns as project_fund_ns
 from .Projects.Mobile.project_stages_api import ns as project_stages_ns
 from .transactions_api import ns as transactions_ns
 from .Projects.Mobile.project_rating_api import ns as rate_ns
+from .Projects.project_comments_api import ns as comments_ns
 
 NAMESPACES = (
     my_projects_list_ns,
@@ -43,7 +44,8 @@ NAMESPACES = (
     project_fund_ns,
     project_stages_ns,
     transactions_ns,
-    rate_ns
+    rate_ns,
+    comments_ns
 )
 
 # Base API

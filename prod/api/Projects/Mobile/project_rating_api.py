@@ -47,3 +47,9 @@ class ProjectRatingResource(Resource):
     def post(self, project_id):
         response = requests.post(URL_PROJECTS+project_id+"/rate", json=request.get_json())
         return api_error_handler(response)
+
+    @ns.response(201, 'Success', code_20x_swg)
+    @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
+    def get(self, project_id):
+        response = requests.get(URL_PROJECTS + project_id + "/rate", params=request.args)
+        return api_error_handler(response)
