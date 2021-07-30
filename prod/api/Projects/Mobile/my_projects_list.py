@@ -1,77 +1,24 @@
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Resource, fields
 from flask import request
 import requests
-import os
-from prod import api_error_handler
 from google.cloud import storage
-from prod.schemas.invalid_token import invalid_token
-from prod.schemas.constants import INVALID_TOKEN
+from prod import api_error_handler
+from prod.schemas.my_projects_list_schema import ns
+from prod.schemas.my_projects_list_schema import body_swg, code_20x_swg, code_400_swg, code_401_swg, code_404_swg, code_503_swg
+from prod.schemas.my_projects_list_schema import MISSING_VALUES_ERROR, SERVER_ERROR, INVALID_TOKEN, USER_NOT_FOUND
 import logging
+import os
 
 PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_PROJECTS = os.getenv("PROJECTS_BACKEND_URL") + "/projects"
 URL_USERS = os.getenv("USERS_BACKEND_URL") + "/users/"
 URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects"
 
-ns = Namespace(
-    'users/<string:user_id>/projects',
-    description='User projects related operations'
-)
-
-
 @ns.route('')
 @ns.param('user_id', 'The user identifier')
 class MyProjectsListResource(Resource):
-    MISSING_VALUES_ERROR = 'Missing values'
-    SERVER_ERROR = "503 Server Error: Service Unavailable for url"
-
-    body_swg = ns.model('MyProjectInput', {
-        'name': fields.String(required=True, description='The project name'),
-        'description': fields.String(
-            required=True, description='The project description'),
-        'hashtags': fields.String(
-            required=True, description='The project hashtags'),
-        'type': fields.String(required=True, description='The project types'),
-        'goal': fields.Integer(
-            required=True, description='The project goal'),
-        'endDate': fields.String(
-            required=True, description='The project end date'),
-        'location': fields.String(
-            required=True, description='The project location'),
-        'lat': fields.Float(
-            required=True, description='The location latitude'),
-        'lon': fields.Float(
-            required=True, description='The location longitude')
-    })
-
-    code_20x_swg = ns.model('MyProjectOutput200', {
-        'id': fields.Integer(description='The project identifier'),
-        'name': fields.String(required=True, description='The project name'),
-        'description': fields.String(
-            required=True, description='The project description'),
-        'hashtags': fields.String(
-            required=True, description='The project hashtags'),
-        'type': fields.String(required=True, description='The project types'),
-        'goal': fields.Integer(
-            required=True, description='The project goal'),
-        'endDate': fields.String(
-            required=True, description='The project end date'),
-        'location': fields.String(
-            required=True, description='The project location'),
-        'lat': fields.Float(
-            required=True, description='The location latitude'),
-        'lon': fields.Float(
-            required=True, description='The location longitude')
-    })
-    code_400_swg = ns.model('ProjectOutput400', {
-        'status': fields.String(example=MISSING_VALUES_ERROR)
-    })
-    code_503_swg = ns.model('ProjectOutput5043', {
-        'status': fields.String(example=SERVER_ERROR)
-    })
-    code_401_swg = ns.model(invalid_token.name, invalid_token)
-
     @ns.response(200, 'Success', fields.List(fields.Nested(code_20x_swg)))
+    @ns.response(404, USER_NOT_FOUND, code_404_swg)
     @ns.response(503, SERVER_ERROR, code_503_swg)
     def get(self, user_id):
         response = requests.get(URL_USERS+user_id+'/projects')
