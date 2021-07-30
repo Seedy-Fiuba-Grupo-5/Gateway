@@ -59,7 +59,7 @@ class UserResource(Resource):
             token = request.args.get('token')
         else:
             token = data.get('token')
-        response = requests.post(URL_USERS + 'auth', json={"token": token, "id": int(user_id)})
+        response = requests.post(URL_USERS + 'auth', json={"token": token, "user_id": int(user_id)})
         auth_body, auth_status_code = api_error_handler(response)
         if auth_status_code == 200:
             response = requests.get(URL_PAYMENTS + user_id,
