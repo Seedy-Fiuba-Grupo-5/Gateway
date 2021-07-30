@@ -81,7 +81,7 @@ class ProjectResource(Resource):
         if status_code != 200:
             return response_body, status_code
         response = requests.post(URL_USERS + '/users/auth',
-                                 json={"token": data.get('token'), "id": response_body.get('user_id')})
+                                 json={"token": data.get('token'), "user_id": response_body.get('user_id')})
         response_object, status_code = api_error_handler(response)
         if status_code != 200:
             return response_object, status_code
