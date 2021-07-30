@@ -118,7 +118,7 @@ class MyProjectsListResource(Resource):
 
     def validate_token(self, user_id):
         data = request.get_json()
-        response = requests.post(URL_USERS + 'auth', json={"token": data.get('token'), "id": int(user_id)})
+        response = requests.post(URL_USERS + 'auth', json={"token": data.get('token'), "user_id": int(user_id)})
         return api_error_handler(response)
 
     def create_project(self):
