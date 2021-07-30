@@ -42,7 +42,9 @@ class ProjectCommentsResource(Resource):
         data = request.get_json()
         if not data:
             token = request.args.get('token')
+            user_id = int(requests.args.get('userId'))
         else:
             token = data["token"]
-        response = requests.get(URL_PROJECTS + project_id, json={"token": token})
+            user_id = int(data["userId"])
+        response = requests.get(URL_PROJECTS + project_id, json={"token": token, "user_id": user_id})
         return api_error_handler(response)
