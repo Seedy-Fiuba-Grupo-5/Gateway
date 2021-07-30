@@ -48,7 +48,7 @@ class ProjectResource(Resource):
         user_id = first_data.get('userPublicId')
         amount_ethers = first_data.get('amountEthers')
         response = requests.post(URL_USERS + '/users/auth',
-                                 json={"token": token, "users_id": user_id})
+                                 json={"token": token, "user_id": user_id})
         response_object, status_code = api_error_handler(response)
         if status_code != 200:
             return response_object, status_code
