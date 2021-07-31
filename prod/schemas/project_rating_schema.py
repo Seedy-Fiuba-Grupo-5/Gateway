@@ -9,7 +9,6 @@ ns = Namespace(
 )
 
 get_models = {
-    "503": [SERVER_ERROR, ns.model(server_error.name, server_error)],
     "201": [SUCCESS, fields.List(fields.Nested(ns.model(project_rating.name,
                                                         project_rating)))],
     "400": [MISSING_VALUES, ns.model(missing_values.name, missing_values)],
