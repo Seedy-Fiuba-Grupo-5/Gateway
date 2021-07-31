@@ -18,3 +18,25 @@ def test_get_user_list(test_app, requests_mock):
     body = json.loads(response.data.decode())
     assert body == json_users_list
 
+def test_post_user_list(test_app, requests_mock):
+    user_id = 1
+    path_client = "/users"
+    data_client = {}
+
+    url_user = USERS_BACKEND_URL + "/users"
+    json_user = { "id": user_id }
+    requests_mock.post(url_user, status_code=201, json=json_user)
+
+    url_pay = PAYMENTS_BACKEND_URL + "/wallets"
+    json_pay = {
+        "address": "an address",
+        "privateKey": "a private key"
+    }
+    requests_mock.post(url_pay, status_code=201, json=json_pay)
+
+    client = test_app.test_client()
+    response = client.post(path_client, data=json.dumps(data_client), content_type='application/json')
+    assert response.status_code == 201
+    body = json.loads(response.data.decode())
+    assert body == {**json_user, **json_pay}
+
