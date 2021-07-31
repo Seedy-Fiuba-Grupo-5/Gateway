@@ -32,3 +32,22 @@ def test_get_seer(test_app, requests_mock):
     assert response.status_code == 200
     body = json.loads(response.data.decode())
     assert body == {**json_user, **json_pay}
+
+
+def test_patch_user(test_app, requests_mock):
+    user_id = 1
+    path_client = "/users/" + str(user_id)
+    data_client = {}
+
+    url_user = USERS_BACKEND_URL + "/users/" + str(user_id)
+    json_user = { "id": user_id }
+    requests_mock.patch(url_user, status_code=200, json=json_user)
+
+    client = test_app.test_client()
+    response = client.patch(path_client, data=json.dumps(data_client), content_type='application/json')
+    assert response.status_code == 200
+    body = json.loads(response.data.decode())
+    assert body == json_user
+
+
+
