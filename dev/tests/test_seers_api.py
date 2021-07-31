@@ -18,3 +18,19 @@ def test_get_seer(test_app, requests_mock):
     assert response.status_code == 200
     body = json.loads(response.data.decode())
     assert body == json_seer
+
+def test_post_seer(test_app, requests_mock):
+    seer_id = 1
+    path_client = "/seers/" + str(seer_id)
+    data_client = {}
+
+    url_seer = USERS_BACKEND_URL + "/seers/" + str(seer_id)
+    json_seer = { "project_info": "some project info" }
+    requests_mock.post(url_seer, status_code=201, json=json_seer)
+
+    client = test_app.test_client()
+    response = client.post(path_client, data=json.dumps(data_client), content_type='application/json')
+    assert response.status_code == 201
+    body = json.loads(response.data.decode())
+    assert body == json_seer
+
