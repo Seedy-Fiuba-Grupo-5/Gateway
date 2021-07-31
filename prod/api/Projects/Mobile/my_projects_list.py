@@ -3,9 +3,7 @@ from flask import request
 import requests
 from google.cloud import storage
 from prod import api_error_handler
-from prod.schemas.my_projects_list_schema import ns
-from prod.schemas.my_projects_list_schema import body_swg, code_20x_swg, code_400_swg, code_401_swg, code_404_swg, code_503_swg
-from prod.schemas.my_projects_list_schema import MISSING_VALUES_ERROR, SERVER_ERROR, INVALID_TOKEN, USER_NOT_FOUND
+from prod.schemas.my_projects_list_schema import ns, get_models, post_models
 import logging
 import os
 
@@ -17,9 +15,9 @@ URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects"
 @ns.route('')
 @ns.param('user_id', 'The user identifier')
 class MyProjectsListResource(Resource):
-    @ns.response(200, 'Success', fields.List(fields.Nested(code_20x_swg)))
-    @ns.response(404, USER_NOT_FOUND, code_404_swg)
-    @ns.response(503, SERVER_ERROR, code_503_swg)
+    @ns.response(200, get_models["200"][0], get_models["200"][1])
+    @ns.response(404, get_models["404"][0], get_models["404"][1])
+    @ns.response(503, get_models["503"][0], get_models["503"][1])
     def get(self, user_id):
         response = requests.get(URL_USERS+user_id+'/projects')
         aux, status_code = api_error_handler(response)
@@ -35,11 +33,12 @@ class MyProjectsListResource(Resource):
             return_value.append(response.json())
         return return_value, 200
 
-    @ns.expect(body_swg)
-    @ns.response(201, 'Success', code_20x_swg)
-    @ns.response(400, MISSING_VALUES_ERROR, code_400_swg)
-    @ns.response(401, INVALID_TOKEN, code_401_swg)
-    @ns.response(503, SERVER_ERROR, code_503_swg)
+    @ns.expect(post_models["payload"])
+    @ns.response(201, post_models["201"][0], post_models["201"][1])
+    @ns.response(400, post_models["400"][0], post_models["400"][1])
+    @ns.response(401, post_models["401"][0], post_models["401"][1])
+    @ns.response(404, post_models["404"][0], post_models["404"][1])
+    @ns.response(503, post_models["503"][0], post_models["503"][1])
     def post(self, user_id):
         data = request.get_json()
         stages_cost = data.get('stagesCost')
