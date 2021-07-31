@@ -20,3 +20,18 @@ def test_get_comments(test_app, requests_mock):
     assert response.status_code == 200
     body = json.loads(response.data.decode())
     assert body == json_comment
+
+def test_post_comment(test_app, requests_mock):
+    project_id = 1
+    path_client = "/commentary/" + str(project_id)
+    data_client = {}
+
+    url_comment = PROJECTS_BACKEND_URL + "/commentary/" + str(project_id)
+    json_comment = {}
+    requests_mock.post(url_comment, status_code=201, json=json_comment)
+
+    client = test_app.test_client()
+    response = client.post(path_client, data=json.dumps(data_client), content_type="application/json")
+    assert response.status_code == 201
+    body = json.loads(response.data.decode())
+    assert body == json_comment
