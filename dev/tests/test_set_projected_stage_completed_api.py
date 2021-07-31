@@ -13,20 +13,22 @@ def test_post_project_funds(test_app, requests_mock):
     json_auth = {"token": new_token}
     requests_mock.post(url_auth, status_code=200, json=json_auth)
 
-    url_funds = PAYMENTS_BACKEND_URL + "/projects/" + str(project_id) + "/funds"
+    url_funds = PAYMENTS_BACKEND_URL + "/projects/" + str(project_id) + "/stages"
     requests_mock.post(url_funds, status_code=202, json={})
 
     client = test_app.test_client()
-    path_client = "/projects/" + str(project_id) + "/funds"
+    path_client = "/projects/" + str(project_id) + "/stages"
     token = "a token"
     user_id = 1
-    amount_ethers = 0.01
+    stage_number = 1
     data_client = {
         "token": token,
-        "userPublicId": user_id,
-        "amountEthers": amount_ethers
+        "reviewerPublicId": user_id,
+        "stageNumber": stage_number
     }
     response = client.post(path_client, data=json.dumps(data_client), content_type="application/json")
     assert response.status_code == 202
     body = json.loads(response.data.decode())
     assert body['token'] == new_token
+
+
