@@ -5,7 +5,7 @@ PROJECTS_BACKEND_URL = os.getenv('PROJECTS_BACKEND_URL')
 USERS_BACKEND_URL = os.getenv('USERS_BACKEND_URL')
 PAYMENTS_BACKEND_URL = os.getenv('PAYMENTS_BACKEND_URL')
 
-def test_get_my_projects(test_app, requests_mock):
+def test_get_favorite_projects(test_app, requests_mock):
     user_id = 1
     project_id_1 = 1
     project_id_2 = 2
@@ -28,3 +28,21 @@ def test_get_my_projects(test_app, requests_mock):
     assert response.status_code == 200
     body = json.loads(response.data.decode())
     assert len(body) == 2
+
+
+def test_post_favorite_project(test_app, requests_mock):
+    user_id = 1
+    project_id = 1
+    data_client = { "project_id": project_id }
+
+    url_fav_user = USERS_BACKEND_URL + "/users/" + str(user_id) + "/favorites"
+    requests_mock.post(url_fav_user, status_code=201, json=data_client)
+
+    url_fav_proj = PROJECTS_BACKEND_URL + "/projects/" + str(project_id) + "/favorites"
+    requests_mock.post(url_fav_proj, status_code=201, json={})
+
+    client = test_app.test_client()
+    path_client = "/users/" + str(user_id) + "/favorites"
+    response = client.post(path_client, data=json.dumps(data_client), content_type="application/json")
+    assert response.status_code == 201
+
