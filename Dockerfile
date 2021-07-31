@@ -14,9 +14,6 @@ RUN pip install --upgrade pip
 COPY ./requirements-prod.txt /usr/src/app/requirements-prod.txt
 RUN pip install -Ur requirements-prod.txt
 
-# Copiar archivos de produccion
-COPY ./prod /usr/src/app/prod
-
 # Indica al inteprete de Python que no genere archivos .pyc
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -30,10 +27,8 @@ ENV FLASK_ENV=production
 # Indica a Flask en que modulo se encuetra la aplicacion
 ENV FLASK_APP=./prod/manage
 
-# Indica las urls de los servicios backends
-ENV PROJECTS_BACKEND_URL='https://seedy-fiuba-backend-projects.herokuapp.com'
-ENV USERS_BACKEND_URL='https://seedy-fiuba-backend-users.herokuapp.com'
-ENV PAYMENTS_BACKEND_URL='https://seedy-fiuba-backend-payments.herokuapp.com'
+# Copiar archivos de produccion
+COPY ./prod /usr/src/app/prod
 
 # Ejecutar el script entrypoint.sh
 ENTRYPOINT ["sh", "/usr/src/app/prod/entrypoint.sh"]
