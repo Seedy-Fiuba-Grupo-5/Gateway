@@ -100,3 +100,24 @@ stages = Model('Project_Set_Completed_Stage_Success', {
     'transationState': fields.String(example='mining / done'),
     'token': fields.String(description='Updated token')
 })
+
+project_model = Model('NotRequiredProjectInput', {
+    'name': fields.String(description='The project name'),
+    'description': fields.String(description='The project description'),
+    'hashtags': fields.String(description='The project hashtags'),
+    'type': fields.String(description='The project types'),
+    'goal': fields.Integer(description='The project goal'),
+    'endDate': fields.String(description='The project end date'),
+    'location': fields.String(description='The project location')
+})
+
+project_api_200 = Model('ProjectOutput200', {
+        'id': fields.Integer(description='The project identifier'),
+        'name': fields.String(description='The project name'),
+        'description': fields.String(description='The project description'),
+        'hashtags': fields.String(description='The project hashtags'),
+        'type': fields.String(description='The project types'),
+        'goal': fields.Integer(description='The project goal'),
+        'endDate': fields.String(description='The project end date'),
+        'location': fields.String(description='The project location')
+    })
