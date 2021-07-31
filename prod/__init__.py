@@ -4,6 +4,8 @@ import requests
 import firebase_admin
 from firebase_admin import credentials
 
+FLASK_ENV = os.getenv('FLASK_ENV')
+
 def create_app(script_info=None):
     # App 'Factory'
 
@@ -12,7 +14,8 @@ def create_app(script_info=None):
 
     import_blueprints(app)
 
-    create_firebase_app()
+    if FLASK_ENV != 'development':
+        create_firebase_app()
 
     return app
 

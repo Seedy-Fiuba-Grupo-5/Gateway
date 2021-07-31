@@ -55,7 +55,7 @@ class MyProjectsListResource(Resource):
         projects_list = response.json()['projects_id']
         return_value = []
         for project in projects_list:
-            response = requests.get(URL_PROJECTS+'/'+str(project))
+            response = requests.get(URL_PROJECTS+str(project))
             aux, status_code = api_error_handler(response)
             if status_code != 200:
                 return aux, status_code

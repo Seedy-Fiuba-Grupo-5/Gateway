@@ -42,7 +42,7 @@ class ProjectCommentsResource(Resource):
         data = request.get_json()
         if not data:
             token = request.args.get('token')
-            user_id = int(requests.args.get('userId'))
+            user_id = int(request.args.get('userId'))
         else:
             token = data["token"]
             user_id = int(data["userId"])
