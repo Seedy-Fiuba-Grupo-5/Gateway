@@ -3,45 +3,22 @@ from flask_restx import Namespace, Resource, fields
 import requests
 import os
 from prod import api_error_handler
+from prod.schemas.common.stages_schema import body_swg
+from prod.schemas.project_stages_schema import ns, post_models
 
 PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_USERS = os.getenv("USERS_BACKEND_URL")
 URL_PAYMENTS = os.getenv("PAYMENTS_BACKEND_URL") + "/projects/"
 
-ns = Namespace(
-    'projects/<string:project_id>/stages',
-    description='Project stages related operations'
-)
 
 @ns.route('')
 @ns.param('project_id', 'The project identifier')
 class ProjectResource(Resource):
-    SUCCESS = 'Transaction being mined'
-    PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
-    SERVER_ERROR = "503 Server Error: Service Unavailable for url"
-    body_swg = ns.model('Project_stages_payload', {
-        'reviewerPublicId': fields.Integer(description='The reviewer id who wants to set a stage completed'),
-        'stageNumber': fields.String(description='The number of the stage to set completed (starting from number 1)')
-    })
-    code_202_swg = ns.model('Project_Set_Completed_Stage_Success', {
-        'id': fields.Integer(description='The transaction Id'),
-        'amountEthers': fields.String(description='The amount of ethers release'),
-        'fromPublicId': fields.String(description='The id of the project where funds comes from'),
-        'fromType': fields.String(example='project'),
-        'toPublicId': fields.String(description='The id of the user reviewer'),
-        'toType': fields.String(example='project'),
-        'transactionType': fields.String(example='stageCompleted'),
-        'transationState': fields.String(example='mining / done'),
-        'token': fields.String(description='Updated token')
-    })
-    code_503_swg = ns.model('ProjectOutput503', {
-        'status': fields.String(example=SERVER_ERROR)
-    })
 
     @ns.doc(params={'token': {'in': 'query', 'type': 'string'}})
     @ns.expect(body_swg)
-    @ns.response(202, SUCCESS, code_202_swg)
-    @ns.response(503, SERVER_ERROR, code_503_swg)
+    @ns.response(202, post_models['202'][0], post_models['202'][1])
+    @ns.response(503, post_models['503'][0], post_models['503'][1])
     def post(self, project_id):
         first_data = request.get_json()
         token = request.args.get('token')
@@ -53,7 +30,7 @@ class ProjectResource(Resource):
         if status_code != 200:
             return response_object, status_code
         new_token = response_object['token']
-        url = URL_PAYMENTS+project_id+'/stages'
+        url = URL_PAYMENTS + project_id + '/stages'
         response = requests.post(
             url,
             headers={"Authorization": PAYMENTS_API_KEY},

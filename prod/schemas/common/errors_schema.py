@@ -5,6 +5,7 @@ INVALID_TOKEN = 'Invalid token; please log in again'
 USER_NOT_FOUND = 'User not found'
 SERVER_ERROR = "Server Error: Service unavailable for url"
 SUCCESS = 'Transaction being mined'
+PROJECT_NOT_FOUND_ERROR = 'The project requested could not be found'
 
 missing_values = Model('Missing_Values', {
     'status': fields.String(description=MISSING_VALUES)

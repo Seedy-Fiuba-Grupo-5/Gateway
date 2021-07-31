@@ -85,4 +85,18 @@ project_rating = Model('RatingsOutput', {
         'lon': fields.Float(
             required=True, description='The location longitude'),
         'rating': fields.Integer(required=True, description='The project rating')
-    })
+})
+
+stages = Model('Project_Set_Completed_Stage_Success', {
+    'id': fields.Integer(description='The transaction Id'),
+    'amountEthers': fields.String(
+        description='The amount of ethers release'),
+    'fromPublicId': fields.String(
+        description='The id of the project where funds comes from'),
+    'fromType': fields.String(example='project'),
+    'toPublicId': fields.String(description='The id of the user reviewer'),
+    'toType': fields.String(example='project'),
+    'transactionType': fields.String(example='stageCompleted'),
+    'transationState': fields.String(example='mining / done'),
+    'token': fields.String(description='Updated token')
+})
