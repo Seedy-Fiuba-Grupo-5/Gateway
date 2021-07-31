@@ -4,6 +4,7 @@ MISSING_VALUES = 'Missing params and/or payload fields'
 INVALID_TOKEN = 'Invalid token; please log in again'
 USER_NOT_FOUND = 'User not found'
 SERVER_ERROR = "Server Error: Service unavailable for url"
+SUCCESS = 'Transaction being mined'
 
 missing_values = Model('Missing_Values', {
     'status': fields.String(description=MISSING_VALUES)

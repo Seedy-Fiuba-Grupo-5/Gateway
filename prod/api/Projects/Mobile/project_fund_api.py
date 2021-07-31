@@ -3,9 +3,9 @@ from flask_restx import Namespace, Resource, fields
 import requests
 import os
 from prod import api_error_handler
-from prod.schemas.project_fund_api import ns
+from prod.schemas.project_fund_schema import ns
 from prod.schemas.common.found_schema import body_swg
-from prod.schemas.project_fund_api import get_models
+from prod.schemas.project_fund_schema import get_models
 
 PAYMENTS_API_KEY = os.getenv("PAYMENTS_API_KEY")
 URL_USERS = os.getenv("USERS_BACKEND_URL")
@@ -19,6 +19,8 @@ class ProjectResource(Resource):
     @ns.doc(params={'token': {'in': 'query', 'type': 'string'}})
     @ns.expect(body_swg)
     @ns.response(202, get_models['202'][0], get_models['202'][1])
+    @ns.response(401, get_models['401'][0], get_models['401'][1])
+    @ns.response(404, get_models['404'][0], get_models['404'][1])
     @ns.response(503, get_models['503'][0], get_models['503'][1])
     def post(self, project_id):
         first_data = request.get_json()
