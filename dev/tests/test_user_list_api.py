@@ -5,7 +5,7 @@ PROJECTS_BACKEND_URL = os.getenv('PROJECTS_BACKEND_URL')
 USERS_BACKEND_URL = os.getenv('USERS_BACKEND_URL')
 PAYMENTS_BACKEND_URL = os.getenv('PAYMENTS_BACKEND_URL')
 
-def get_user_list(test_app, requests_mock):
+def test_get_user_list(test_app, requests_mock):
     path_client = "/users"
 
     url_users_list = USERS_BACKEND_URL + "/users"
@@ -17,3 +17,4 @@ def get_user_list(test_app, requests_mock):
     assert response.status_code == 200
     body = json.loads(response.data.decode())
     assert body == json_users_list
+
