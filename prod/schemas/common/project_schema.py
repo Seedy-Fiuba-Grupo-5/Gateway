@@ -66,3 +66,23 @@ project_full_out = Model('Project_Full_Output', {
     'video': fields.String(description=PROJECT_DESCRIPTIONS['video']),
     'path': fields.String(description=PROJECT_DESCRIPTIONS['path']),
 })
+
+project_rating = Model('RatingsOutput', {
+        'name': fields.String(required=True, description='The project name'),
+        'description': fields.String(
+            required=True, description='The project description'),
+        'hashtags': fields.String(
+            required=True, description='The project hashtags'),
+        'type': fields.String(required=True, description='The project types'),
+        'goal': fields.Integer(
+            required=True, description='The project goal'),
+        'endDate': fields.String(
+            required=True, description='The project end date'),
+        'location': fields.String(
+            required=True, description='The project location'),
+        'lat': fields.Float(
+            required=True, description='The location latitude'),
+        'lon': fields.Float(
+            required=True, description='The location longitude'),
+        'rating': fields.Integer(required=True, description='The project rating')
+    })

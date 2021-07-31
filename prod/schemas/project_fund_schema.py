@@ -1,9 +1,8 @@
 from flask_restx import Namespace, fields
 from .common.found_schema import body_swg
 from .common.errors_schema import server_error, user_not_found, invalid_token
-from .common.errors_schema import SERVER_ERROR, USER_NOT_FOUND, INVALID_TOKEN
-SUCCESS = 'Transaction being mined'
-
+from .common.errors_schema import SERVER_ERROR, USER_NOT_FOUND, INVALID_TOKEN, \
+    SUCCESS
 
 ns = Namespace(
     'projects/<string:project_id>/funds',
