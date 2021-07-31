@@ -34,31 +34,36 @@ def test_post_favorite_project(test_app, requests_mock):
     user_id = 1
     project_id = 1
     data_client = { "project_id": project_id }
+    body_client = {}
 
     url_fav_user = USERS_BACKEND_URL + "/users/" + str(user_id) + "/favorites"
     requests_mock.post(url_fav_user, status_code=201, json=data_client)
 
     url_fav_proj = PROJECTS_BACKEND_URL + "/projects/" + str(project_id) + "/favorites"
-    requests_mock.post(url_fav_proj, status_code=201, json={})
+    requests_mock.post(url_fav_proj, status_code=201, json=body_client)
 
     client = test_app.test_client()
     path_client = "/users/" + str(user_id) + "/favorites"
     response = client.post(path_client, data=json.dumps(data_client), content_type="application/json")
     assert response.status_code == 201
+    body = json.loads(response.data.decode())
+    assert body == body_client
+
 
 def test_delete_favorite_project(test_app, requests_mock):
     user_id = 1
     project_id = 1
     data_client = { "project_id": project_id }
-    response_client = {}
+    body_client = {}
     url_fav_user = USERS_BACKEND_URL + "/users/" + str(user_id) + "/favorites"
     requests_mock.delete(url_fav_user, status_code=200, json=data_client)
 
     url_fav_proj = PROJECTS_BACKEND_URL + "/projects/" + str(project_id) + "/favorites"
-    requests_mock.delete(url_fav_proj, status_code=200, json=response_client)
+    requests_mock.delete(url_fav_proj, status_code=200, json=body_client)
 
     client = test_app.test_client()
     path_client = '/users/' + str(user_id) + "/favorites"
     response = client.delete(path_client, data=json.dumps(data_client), content_type="application/json")
     assert response.status_code == 200
-    # assert response.body == response_client
+    body = json.loads(response.data.decode())
+    assert body == body_client
