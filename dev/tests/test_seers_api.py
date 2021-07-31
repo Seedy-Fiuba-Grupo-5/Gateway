@@ -54,3 +54,20 @@ def test_patch_seer(test_app, requests_mock):
     body = json.loads(response.data.decode())
     assert body == json_seer
 
+
+def test_delete_seer(test_app, requests_mock):
+    seer_id = 1
+    project_id = 1
+    path_client = "/seers/" + str(seer_id)
+    data_client = {}
+
+    url_seer = USERS_BACKEND_URL + "/seers/" + str(seer_id)
+    json_seer = { "success": "success" }
+    requests_mock.delete(url_seer, status_code=200, json=json_seer)
+
+    client = test_app.test_client()
+    response = client.delete(path_client, data=json.dumps(data_client), content_type='application/json')
+    assert response.status_code == 200
+    body = json.loads(response.data.decode())
+    assert body == json_seer
+
