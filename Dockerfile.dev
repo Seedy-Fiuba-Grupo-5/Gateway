@@ -1,4 +1,4 @@
-# Dockerfile para produccion
+# Dockerfile para desarrollo
 
 # Imagen base de python
 FROM python:3.8
@@ -12,7 +12,9 @@ RUN apt-get update
 # Instalar dependencias
 RUN pip install --upgrade pip
 COPY ./requirements-prod.txt /usr/src/app/requirements-prod.txt
+COPY ./requirements-dev.txt /usr/src/app/requirements-dev.txt
 RUN pip install -Ur requirements-prod.txt
+RUN pip install -Ur requirements-dev.txt
 
 # Indica al inteprete de Python que no genere archivos .pyc
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -22,13 +24,14 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Indica a Flask que estamos en un ambiente de produccion
-ENV FLASK_ENV=production
+ENV FLASK_ENV=development
 
 # Indica a Flask en que modulo se encuetra la aplicacion
 ENV FLASK_APP=./prod/manage
 
-# Copiar archivos de produccion
+# Copiar archivos
 COPY ./prod /usr/src/app/prod
+COPY ./prod /usr/src/app/dev
 
 # Ejecutar el script entrypoint.sh
 ENTRYPOINT ["sh", "/usr/src/app/prod/entrypoint.sh"]
