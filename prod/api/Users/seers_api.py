@@ -53,10 +53,6 @@ class UserResource(Resource):
         """Update user data"""
         first_data = request.get_json()
         project_id = first_data.get('project_id')
-        response = requests.patch(URL_USERS+user_id, json=first_data)
-        response_object, status_code = api_error_handler(response)
-        if status_code != 200:
-            return response_object, status_code
         url = URL_PAYMENTS+str(project_id)
         response = requests.patch(
             url,
@@ -65,7 +61,8 @@ class UserResource(Resource):
         response_pay, status_pay = api_error_handler(response)
         if status_pay != 202:
             return response_pay, status_pay
-        return response_object, status_code
+        response = requests.patch(URL_USERS+user_id, json=first_data)
+        return api_error_handler(response)
 
     @ns.expect(body_swg)
     @ns.response(200, 'Success', code_200_swg)

@@ -40,13 +40,13 @@ def test_patch_seer(test_app, requests_mock):
     path_client = "/seers/" + str(seer_id)
     data_client = { "project_id": project_id }
 
-    url_seer = USERS_BACKEND_URL + "/seers/" + str(seer_id)
-    json_seer = { "success": "success" }
-    requests_mock.patch(url_seer, status_code=200, json=json_seer)
-
     url_pay = PAYMENTS_BACKEND_URL + "/projects/" + str(project_id)
     json_pay = {}
     requests_mock.patch(url_pay, status_code=202, json=json_pay)
+
+    url_seer = USERS_BACKEND_URL + "/seers/" + str(seer_id)
+    json_seer = { "success": "success" }
+    requests_mock.patch(url_seer, status_code=200, json=json_seer)
 
     client = test_app.test_client()
     response = client.patch(path_client, data=json.dumps(data_client), content_type='application/json')
