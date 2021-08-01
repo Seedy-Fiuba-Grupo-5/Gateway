@@ -24,6 +24,12 @@ services:
     ports:
       - 5002:5002
 
+    environment:
+      - PORT=5002
+      - PROJECTS_BACKEND_URL=https://seedy-fiuba-backend-projects.herokuapp.com
+      - USERS_BACKEND_URL=https://seedy-fiuba-backend-users.herokuapp.com
+      - PAYMENTS_BACKEND_URL=https://seedy-fiuba-backend-payments.herokuapp.com
+
     env_file:
       - .env
 

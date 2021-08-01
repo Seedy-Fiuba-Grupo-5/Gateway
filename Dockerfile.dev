@@ -23,6 +23,12 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # a la terminal, sin esperar en un buffer intermedio.
 ENV PYTHONUNBUFFERED 1
 
+# Indica a Flask que estamos en un ambiente de produccion
+ENV FLASK_ENV=development
+
+# Indica a Flask en que modulo se encuetra la aplicacion
+ENV FLASK_APP=./prod/manage
+
 # Copiar archivos
 COPY ./prod /usr/src/app/prod
 COPY ./prod /usr/src/app/dev
