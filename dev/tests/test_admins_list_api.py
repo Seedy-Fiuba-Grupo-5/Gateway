@@ -17,3 +17,17 @@ def test_get_admins_list(test_app, requests_mock):
     assert response.status_code == 200
     body = json.loads(response.data.decode())
     assert body == json_admins_list
+
+def test_post_admins_list(test_app, requests_mock):
+    path_client = "/admins"
+    data_client = {"name": "an admin name"}
+
+    url_admins_list = USERS_BACKEND_URL + "/admins"
+    json_admin = { "id": 1 }
+    requests_mock.post(url_admins_list, status_code=201, json=json_admin)
+
+    client = test_app.test_client()
+    response = client.post(path_client, data=json.dumps(data_client), content_type='application/json')
+    assert response.status_code == 201
+    body = json.loads(response.data.decode())
+    assert body == json_admin
